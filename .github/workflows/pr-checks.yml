@@ -44,11 +44,16 @@ jobs:
               comment.body.includes('## Test Results')
             );
             
-            const status = '${{ job.status }}' === 'success' ? '✅' : '❌';
+            const jobStatus = '${{ job.status }}';
+            const isSuccess = jobStatus === 'success';
+            const status = isSuccess ? '✅' : '❌';
+            const testResult = isSuccess ? 'Passed' : 'Failed';
+            const buildResult = isSuccess ? 'Success' : 'Failed';
+            
             const body = `## Test Results ${status}
             
-            Tests: ${{ job.status === 'success' && 'Passed' || 'Failed' }}
-            Build: ${{ job.status === 'success' && 'Success' || 'Failed' }}
+            Tests: ${testResult}
+            Build: ${buildResult}
             
             Run ID: ${{ github.run_id }}`;
 
