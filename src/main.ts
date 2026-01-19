@@ -3,6 +3,9 @@
  */
 
 import { Game } from './core/Game';
+import { createCategoryLogger } from './utils/Logger';
+
+const logger = createCategoryLogger('Main');
 
 // Suppress known Firefox/Babylon.js WEBGL deprecation warning
 const originalWarn = console.warn;
@@ -18,6 +21,7 @@ console.warn = (...args: any[]) => {
 // Initialize game when DOM is ready
 document.addEventListener('DOMContentLoaded', async () => {
   try {
+    logger.info('Initializing game...');
     const game = new Game('renderCanvas');
     await game.initialize();
     
@@ -26,8 +30,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Expose game to window for debugging
     (window as any).game = game;
+    logger.info('Game ready');
   } catch (error) {
-    console.error('Failed to initialize game:', error);
+    logger.error('Failed to initialize game', error as Error);
     const errorDiv = document.createElement('div');
     errorDiv.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: red; color: white; padding: 20px; z-index: 10000;';
     errorDiv.textContent = `Failed to initialize game: ${error}`;

@@ -6,6 +6,7 @@ import { Scene, AbstractMesh, AssetContainer } from '@babylonjs/core';
 import { AssetCatalog } from './AssetCatalog';
 import { PrimitiveFactory } from './PrimitiveFactory';
 import { MaterialLibrary } from './MaterialLibrary';
+import { createCategoryLogger } from '../utils/Logger';
 
 export interface LoadedAsset {
   id: string;
@@ -23,6 +24,7 @@ export class AssetManager {
   private primitiveFactory: PrimitiveFactory;
   private materialLibrary: MaterialLibrary;
   private usePrimitives: boolean = true; // MVP mode - use primitives
+  private logger = createCategoryLogger('AssetManager');
 
   private constructor() {
     this.catalog = AssetCatalog.getInstance();
@@ -65,7 +67,7 @@ export class AssetManager {
     // Check catalog
     const catalogEntry = this.catalog.getAsset(assetId);
     if (!catalogEntry) {
-      console.warn(`Asset ${assetId} not found in catalog`);
+      this.logger.warn('Asset not found in catalog', { assetId });
       return null;
     }
 

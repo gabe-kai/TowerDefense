@@ -13,6 +13,7 @@ import { AISystem } from '../systems/AISystem';
 import { GameUI } from '../ui/GameUI';
 import { PowerCalculator } from '../utils/PowerCalculator';
 import { Vector3 } from '@babylonjs/core';
+import { createCategoryLogger } from '../utils/Logger';
 
 export class Game {
   private sceneManager: SceneManager | null = null;
@@ -29,17 +30,18 @@ export class Game {
   private aiSystem: AISystem | null = null;
   private gameUI: GameUI | null = null;
   private powerCalculator: PowerCalculator;
+  private logger = createCategoryLogger('Game');
 
   // Game loop
   private lastUpdateTime: number = 0;
   private updateInterval: number = 16; // ~60 FPS
 
   constructor(canvasId: string) {
-    const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
-    if (!canvas) {
+    const canvasElement = document.getElementById(canvasId);
+    if (!canvasElement || !(canvasElement instanceof HTMLCanvasElement)) {
       throw new Error(`Canvas element with id "${canvasId}" not found`);
     }
-    this.canvas = canvas;
+    this.canvas = canvasElement;
     this.stateManager = GameStateManager.getInstance();
     this.powerCalculator = PowerCalculator.getInstance();
   }
@@ -91,7 +93,11 @@ export class Game {
     // Start game loop
     this.startGameLoop();
 
-    console.log('Game initialized');
+    this.logger.info('Game initialized', { 
+      playerTower: playerTower.getPosition(), 
+      aiTower: aiTower.getPosition(),
+      initialResources: this.resourceSystem.getAllResources().length
+    });
   }
 
   /**
@@ -104,7 +110,7 @@ export class Game {
 
     this.stateManager.setPhase(GamePhase.PLAYING);
     this.isRunning = true;
-    console.log('Game started');
+    this.logger.info('Game started');
   }
 
   /**
@@ -239,7 +245,7 @@ export class Game {
       this.gameUI.showGameOver(winner, message);
     }
 
-    console.log(`Game Over: ${winner} wins - ${message}`);
+    this.logger.info('Game Over', { winner, message, wave: this.waveSystem?.getCurrentWave() || 0 });
   }
 
   /**

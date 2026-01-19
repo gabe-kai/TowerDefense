@@ -8,8 +8,8 @@ import { Tower } from '../entities/Tower';
 export class PowerLevelDisplay {
   private container: HTMLDivElement;
   private powerCalculator: PowerCalculator;
-  private playerPowerElement: HTMLDivElement;
-  private aiPowerElement: HTMLDivElement;
+  private playerPowerElement!: HTMLSpanElement; // Definite assignment - initialized in createDisplay()
+  private aiPowerElement!: HTMLSpanElement; // Definite assignment - initialized in createDisplay()
 
   constructor(containerId: string) {
     this.powerCalculator = PowerCalculator.getInstance();

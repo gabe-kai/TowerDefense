@@ -10,6 +10,7 @@ import { Tower } from '../entities/Tower';
 import { Resource } from '../entities/Resource';
 import { BuildingType, RoomType } from '../components/BuildingComponent';
 import { GameStateManager } from '../core/GameState';
+import { createCategoryLogger } from '../utils/Logger';
 
 export class AISystem {
   private servantSystem: ServantSystem;
@@ -21,6 +22,7 @@ export class AISystem {
   private actionInterval: number = 2000; // 2 seconds between AI actions
   private lastResourceCollectionTime: number = 0;
   private resourceCollectionInterval: number = 3000; // 3 seconds between resource collection attempts
+  private logger = createCategoryLogger('AISystem');
 
   constructor(
     servantSystem: ServantSystem,
@@ -147,11 +149,14 @@ export class AISystem {
 
     // Try to build a turret
     if (this.buildingSystem.buildGroundStructure(BuildingType.TURRET, structurePos, 'ai')) {
+      this.logger.debug('AI built turret', { position: structurePos });
       return;
     }
 
     // Fallback to barrier
-    this.buildingSystem.buildGroundStructure(BuildingType.BARRIER, structurePos, 'ai');
+    if (this.buildingSystem.buildGroundStructure(BuildingType.BARRIER, structurePos, 'ai')) {
+      this.logger.debug('AI built barrier', { position: structurePos });
+    }
   }
 
   /**
