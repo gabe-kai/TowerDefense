@@ -7,6 +7,7 @@ import { Enemy } from '../entities/Enemy';
 import { CombatComponent, EnemyType } from '../components/CombatComponent';
 import { Tower } from '../entities/Tower';
 import { AssetCatalog, AssetCategory, AssetType } from '../assets/AssetCatalog';
+import { createCategoryLogger } from '../utils/Logger';
 
 export interface EnemySpawnConfig {
   type: EnemyType;
@@ -19,6 +20,7 @@ export class EnemySystem {
   private enemies: Enemy[] = [];
   private catalog: AssetCatalog;
   private lastUpdateTime: number = 0;
+  private logger = createCategoryLogger('EnemySystem');
 
   // Enemy type definitions
   private enemyDefinitions: Map<EnemyType, { health: number; attack: number; defense: number; speed: number }> = new Map();
@@ -100,6 +102,7 @@ export class EnemySystem {
   spawnEnemy(type: EnemyType, position: Vector3, targetTower: Tower): Enemy {
     const def = this.enemyDefinitions.get(type);
     if (!def) {
+      this.logger.error('Enemy type not defined', undefined, { type });
       throw new Error(`Enemy type ${type} not defined`);
     }
 
@@ -117,6 +120,7 @@ export class EnemySystem {
     enemy.setTargetTower(targetTower);
     this.enemies.push(enemy);
 
+    this.logger.debug('Enemy spawned', { type, position, health: def.health });
     return enemy;
   }
 

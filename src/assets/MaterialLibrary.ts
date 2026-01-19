@@ -112,7 +112,7 @@ export class MaterialLibrary {
     const material = new StandardMaterial(id, scene);
     material.diffuseColor = materialDef.color;
     material.roughness = materialDef.roughness ?? 0.5;
-    material.metallic = materialDef.metallic ?? 0.0;
+    // Note: metallic property not available in StandardMaterial, using roughness for PBR approximation
     
     if (materialDef.emissive) {
       material.emissiveColor = materialDef.emissive;

@@ -9,6 +9,7 @@ import { BuildingValidator } from '../utils/BuildingValidator';
 import { GameStateManager } from '../core/GameState';
 import { AssetCatalog, AssetCategory, AssetType } from '../assets/AssetCatalog';
 import { PowerCalculator } from '../utils/PowerCalculator';
+import { createCategoryLogger } from '../utils/Logger';
 
 export interface BuildingDefinition {
   type: BuildingType;
@@ -37,6 +38,7 @@ export class BuildingSystem {
   private stateManager: GameStateManager;
   private catalog: AssetCatalog;
   private powerCalculator: PowerCalculator;
+  private logger = createCategoryLogger('BuildingSystem');
 
   // Building definitions
   private buildingDefinitions: Map<BuildingType, BuildingDefinition> = new Map();
@@ -173,6 +175,7 @@ export class BuildingSystem {
     tower.getBaseMesh().metadata = { component: baseComponent };
 
     this.stateManager.setTowerHeight('player', tower.getHeight());
+    this.logger.info('Player tower created', { position, height: tower.getHeight() });
     return tower;
   }
 
@@ -208,6 +211,7 @@ export class BuildingSystem {
   buildFloor(tower: Tower, roomType: RoomType, buildingType: BuildingType, player: 'player' | 'ai'): boolean {
     const def = this.buildingDefinitions.get(buildingType);
     if (!def) {
+      this.logger.warn('Building definition not found', { buildingType });
       return false;
     }
 
@@ -215,6 +219,12 @@ export class BuildingSystem {
     const resources = this.stateManager.getResources(player);
     for (const [resource, amount] of Object.entries(def.cost)) {
       if (amount && (resources[resource as keyof typeof resources] < amount)) {
+        this.logger.warn('Insufficient resources for building', { 
+          player, 
+          buildingType, 
+          required: def.cost, 
+          available: resources 
+        });
         return false;
       }
     }
@@ -245,6 +255,7 @@ export class BuildingSystem {
     tower.addFloor(roomType, buildingType, component);
     this.stateManager.setTowerHeight(player, tower.getHeight());
     
+    this.logger.info('Tower floor built', { player, buildingType, roomType, height: tower.getHeight(), cost: def.cost });
     return true;
   }
 

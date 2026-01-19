@@ -2,19 +2,21 @@
  * Scene Manager - 3D scene setup and management
  */
 
-import { Engine, Scene, ArcRotateCamera, HemisphericLight, Vector3, Color3 } from '@babylonjs/core';
+import { Engine, Scene, ArcRotateCamera, HemisphericLight, Vector3, Color4 } from '@babylonjs/core';
 import '@babylonjs/core/Cameras/Inputs/arcRotateCameraPointersInput';
 import { PrimitiveFactory } from '../assets/PrimitiveFactory';
 import { MaterialLibrary } from '../assets/MaterialLibrary';
 import { AssetCatalog, AssetCategory, AssetType } from '../assets/AssetCatalog';
+import { createCategoryLogger } from '../utils/Logger';
 
 export class SceneManager {
   private engine: Engine;
   private scene: Scene;
-  private camera: ArcRotateCamera;
+  private camera!: ArcRotateCamera; // Definite assignment - initialized in setupCamera()
   private primitiveFactory: PrimitiveFactory;
   private materialLibrary: MaterialLibrary;
   private catalog: AssetCatalog;
+  private logger = createCategoryLogger('SceneManager');
   private canvas: HTMLCanvasElement;
 
   constructor(canvas: HTMLCanvasElement) {
@@ -32,7 +34,7 @@ export class SceneManager {
 
     // Create scene
     this.scene = new Scene(this.engine);
-    this.scene.clearColor = new Color3(0.5, 0.8, 1.0); // Sky blue
+    this.scene.clearColor = new Color4(0.5, 0.8, 1.0, 1.0); // Sky blue
 
     // Initialize asset systems
     this.primitiveFactory = PrimitiveFactory.getInstance();
@@ -76,7 +78,9 @@ export class SceneManager {
     
     // Attach camera controls using inputs manager
     // In Babylon.js v6, use camera.inputs.attachElement
+    // @ts-ignore - attachElement accepts HTMLCanvasElement but TypeScript types may be incorrect
     this.camera.inputs.attachElement(this.canvas);
+    this.logger.debug('Camera initialized', { position: this.camera.position, target: this.camera.getTarget() });
 
     // Set camera limits
     this.camera.lowerBetaLimit = 0.1;
@@ -125,6 +129,7 @@ export class SceneManager {
 
     // Add some decorative elements
     this.addValleyDecorations();
+    this.logger.info('Valley terrain created', { size: '50x50', hills: 2 });
   }
 
   private addValleyDecorations(): void {

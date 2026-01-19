@@ -7,8 +7,8 @@ import { WaveSystem } from '../systems/WaveSystem';
 export class WaveTimer {
   private container: HTMLDivElement;
   private waveSystem: WaveSystem;
-  private timerElement: HTMLDivElement;
-  private waveNumberElement: HTMLDivElement;
+  private timerElement!: HTMLDivElement; // Definite assignment - initialized in createDisplay()
+  private waveNumberElement!: HTMLDivElement; // Definite assignment - initialized in createDisplay()
   private triggerButton: HTMLButtonElement | null = null;
 
   constructor(containerId: string, waveSystem: WaveSystem) {

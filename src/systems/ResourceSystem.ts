@@ -6,6 +6,7 @@ import { Scene, Vector3 } from '@babylonjs/core';
 import { Resource } from '../entities/Resource';
 import { ResourceComponent, ResourceType } from '../components/ResourceComponent';
 import { AssetCatalog, AssetCategory, AssetType } from '../assets/AssetCatalog';
+import { createCategoryLogger } from '../utils/Logger';
 
 export interface ResourceSpawnConfig {
   type: ResourceType;
@@ -18,6 +19,7 @@ export class ResourceSystem {
   private scene: Scene;
   private resources: Resource[] = [];
   private catalog: AssetCatalog;
+  private logger = createCategoryLogger('ResourceSystem');
   
   // Valley bounds for spawning
   private valleyBounds = {
@@ -69,6 +71,7 @@ export class ResourceSystem {
     const resource = new Resource(resourceType, spawnPosition, amount);
     this.resources.push(resource);
 
+    this.logger.debug('Resource spawned', { type: resourceType, amount, position: spawnPosition });
     return resource;
   }
 
@@ -76,14 +79,17 @@ export class ResourceSystem {
    * Spawn multiple resources randomly
    */
   spawnRandomResources(count: number): void {
+    let spawned = 0;
     for (let i = 0; i < count; i++) {
       // Check spawn chance for each resource type
       this.spawnConfigs.forEach(config => {
         if (Math.random() < config.spawnChance) {
           this.spawnResource(config.type);
+          spawned++;
         }
       });
     }
+    this.logger.info('Random resources spawned', { requested: count, spawned });
   }
 
   /**

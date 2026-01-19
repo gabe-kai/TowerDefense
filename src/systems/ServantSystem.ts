@@ -8,6 +8,7 @@ import { Resource } from '../entities/Resource';
 import { GameStateManager } from '../core/GameState';
 import { AssetCatalog, AssetCategory, AssetType } from '../assets/AssetCatalog';
 import { ResourceType } from '../components/ResourceComponent';
+import { createCategoryLogger } from '../utils/Logger';
 
 export class ServantSystem {
   private scene: Scene;
@@ -15,6 +16,7 @@ export class ServantSystem {
   private stateManager: GameStateManager;
   private catalog: AssetCatalog;
   private lastUpdateTime: number = 0;
+  private logger = createCategoryLogger('ServantSystem');
 
   constructor(scene: Scene) {
     this.scene = scene;
@@ -47,6 +49,7 @@ export class ServantSystem {
       this.stateManager.addServant('ai');
     }
 
+    this.logger.info('Servant created', { player, position, totalServants: this.servants.length });
     return servant;
   }
 
@@ -63,13 +66,16 @@ export class ServantSystem {
       this.stateManager.addResource(player, 'stone', -5);
       
       this.createServant(position, player);
+      this.logger.info('Servant recruited', { player, cost: { wood: 10, stone: 5 } });
       return true;
     } else if (player === 'ai') {
       // AI can recruit (simplified for MVP)
       this.createServant(position, player);
+      this.logger.debug('AI servant recruited', { position });
       return true;
     }
 
+    this.logger.warn('Servant recruitment failed', { player, resources });
     return false;
   }
 
@@ -102,7 +108,7 @@ export class ServantSystem {
     });
 
     if (nearest) {
-      nearest.queueCollectCommand(resource);
+      this.commandCollect(nearest, resource);
       return true;
     }
 
@@ -144,6 +150,7 @@ export class ServantSystem {
           const amount = resource.getAmount();
           const player = servant.getMesh().name.startsWith('player') ? 'player' : 'ai';
           this.stateManager.addResource(player, resourceType, amount);
+          this.logger.debug('Resource delivered', { player, type: resourceType, amount });
         }
       });
     }

@@ -7,6 +7,7 @@ import { EnemySystem, EnemySpawnConfig } from './EnemySystem';
 import { EnemyType } from '../components/CombatComponent';
 import { Tower } from '../entities/Tower';
 import { GameStateManager, GamePhase } from '../core/GameState';
+import { createCategoryLogger } from '../utils/Logger';
 
 export interface WaveConfig {
   waveNumber: number;
@@ -23,6 +24,7 @@ export class WaveSystem {
   private waveInterval: number = 120000; // 2 minutes in milliseconds
   private waveActive: boolean = false;
   private earlyTriggerBonus: number = 1.5; // 50% bonus for early trigger
+  private logger = createCategoryLogger('WaveSystem');
 
   constructor(enemySystem: EnemySystem) {
     this.enemySystem = enemySystem;
@@ -91,7 +93,13 @@ export class WaveSystem {
     // Spawn enemies
     this.enemySystem.spawnWave(waveConfig.enemyConfigs, targetTower);
 
-    console.log(`Wave ${this.currentWave} started with ${waveConfig.enemyConfigs.reduce((sum, c) => sum + c.count, 0)} enemies`);
+    const totalEnemies = waveConfig.enemyConfigs.reduce((sum, c) => sum + c.count, 0);
+    this.logger.info('Wave started', { 
+      waveNumber: this.currentWave, 
+      enemyCount: totalEnemies,
+      bonusMultiplier,
+      enemyTypes: waveConfig.enemyConfigs.map(c => ({ type: c.type, count: c.count }))
+    });
   }
 
   /**
@@ -262,7 +270,7 @@ export class WaveSystem {
     this.waveActive = false;
     this.stateManager.setPhase(GamePhase.PLAYING);
     this.scheduleNextWave();
-    console.log(`Wave ${this.currentWave} completed`);
+    this.logger.info('Wave completed', { waveNumber: this.currentWave });
   }
 
   /**
