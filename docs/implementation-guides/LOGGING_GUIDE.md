@@ -171,6 +171,42 @@ logger.info('Task completed', { taskId, taskType });
 logger.info('Work queue cleared');
 ```
 
+### Servant Visual Feedback
+```typescript
+const logger = createCategoryLogger('Servant');
+
+logger.debug('Resource collected, returning home', { resourceType, amount });
+logger.debug('Reached home, ready to deliver', { resourceType });
+logger.debug('Creating carrying indicator', { resourceType });
+logger.debug('Cannot create carrying indicator - no scene reference');
+```
+
+### Servant System (Delivery Feedback and Task Assignment)
+```typescript
+const logger = createCategoryLogger('ServantSystem');
+
+logger.info('Servant created', { player, position, totalServants });
+logger.debug('Resource delivered', { player, type, amount });
+logger.info('Resource delivered to tower', { player, type, amount });
+logger.debug('Delivery feedback shown', { resourceType, amount, position });
+logger.debug('Work queue task completed', { taskId, resourceType });
+logger.debug('No available servants for task assignment', { unassignedTasks, totalServants });
+logger.debug('Assigning tasks to servants', { unassignedTasks, availableServants });
+logger.debug('Task assigned to servant', { taskId, servantName, servantState });
+logger.warn('Failed to assign task to servant', { taskId });
+```
+
+### Servant Entity (Visual Feedback and Work Flow)
+```typescript
+const logger = createCategoryLogger('Servant');
+
+logger.debug('Reached resource, starting work', { resourceType });
+logger.debug('Resource collected, returning home', { resourceType, amount });
+logger.debug('Reached home, ready to deliver', { resourceType });
+logger.debug('Creating carrying indicator', { resourceType });
+logger.debug('Cannot create carrying indicator - no scene reference');
+```
+
 ## Performance
 
 - Logging is **asynchronous** to avoid blocking game loop

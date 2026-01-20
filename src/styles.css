@@ -72,7 +72,8 @@ html, body {
 .wave-timer {
   position: fixed;
   top: 20px;
-  right: 20px;
+  left: 50%;
+  transform: translateX(-50%); /* Center horizontally */
   background: rgba(20, 15, 30, 0.9);
   border: 2px solid #8b6f47;
   border-radius: 8px;
@@ -258,6 +259,92 @@ html, body {
   background: #a0825f;
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Minimap */
+.minimap {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  left: auto;
+  background: rgba(20, 15, 30, 0.9);
+  border: 2px solid #8b6f47;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  width: 220px;
+  height: 220px;
+}
+
+/* Ensure compass can be positioned absolutely within minimap */
+.minimap > .compass {
+  position: absolute;
+}
+
+.minimap-canvas {
+  width: 200px;
+  height: 200px;
+  display: block;
+  border-radius: 4px;
+}
+
+/* Compass - Overlay on minimap */
+.compass {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: rgba(20, 15, 30, 0.95);
+  border: 1px solid #8b6f47;
+  border-radius: 4px;
+  padding: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  z-index: 101; /* Above minimap */
+  width: 64px;
+  height: 64px;
+}
+
+.compass-canvas {
+  width: 60px;
+  height: 60px;
+  display: block;
+  border-radius: 2px;
+}
+
+.axis-indicator-title {
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-align: center;
+  color: #d4af37;
+  border-bottom: 1px solid #8b6f47;
+  padding-bottom: 4px;
+}
+
+.axis-indicator-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.axis-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.axis-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.axis-label {
+  font-weight: bold;
+  min-width: 20px;
 }
 
 /* Game Over Modal */

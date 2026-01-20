@@ -85,20 +85,33 @@ export class Game {
     // Initialize AI
     this.aiSystem.initialize(aiTower);
 
-    // Create initial servant for player
-    this.servantSystem.createServant(playerTowerPos.add(new Vector3(2, 0, 0)), 'player');
+    // Create initial servant for player (on ground level, near tower)
+    const servantPos = playerTowerPos.clone();
+    servantPos.x += 2; // 2 units to the right of tower
+    servantPos.y = 0.5; // On ground level (cylinder height is 0.5, so center at 0.5 puts bottom on ground)
+    this.servantSystem.createServant(servantPos, 'player');
 
     // Spawn initial resources
     this.resourceSystem.spawnRandomResources(20);
 
     // Initialize UI
-    this.gameUI = new GameUI(this.waveSystem, this.buildingSystem);
+    const camera = this.sceneManager.getCamera();
+    this.gameUI = new GameUI(
+      this.waveSystem, 
+      this.buildingSystem,
+      this.resourceSystem,
+      this.servantSystem,
+      camera
+    );
 
     // Start render loop
     this.sceneManager.render();
 
     // Set initial game phase
     this.stateManager.setPhase(GamePhase.PLAYING);
+
+    // Start the game (set isRunning before starting loop)
+    this.isRunning = true;
 
     // Start game loop
     this.startGameLoop();
@@ -191,6 +204,8 @@ export class Game {
       const playerTower = this.buildingSystem.getPlayerTower();
       const aiTower = this.buildingSystem.getAITower();
       this.gameUI.update(playerTower, aiTower);
+      this.gameUI.updateMinimap();
+      this.gameUI.updateCompass();
     }
 
     // Check win/loss conditions
