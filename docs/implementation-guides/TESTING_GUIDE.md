@@ -56,6 +56,7 @@ For integration tests that need real 3D rendering, use a separate test environme
   - Game systems (ResourceSystem, ServantSystem, BuildingSystem, etc.)
   - Utilities (Pathfinding, PowerCalculator, Logger)
   - Components (ResourceComponent, BuildingComponent, CombatComponent)
+  - UI Components (Minimap, Compass, InfoPanel, WorkQueuePanel, etc.)
 
 ## Writing Tests
 
@@ -87,6 +88,19 @@ const resource = createTestResource(ResourceType.WOOD, 5);
 const servant = createTestServant('servant_1', createVector3(0, 0, 0));
 ```
 
+## UI Component Testing
+
+UI components that use HTML5 Canvas (like `Minimap` and `Compass`) require special consideration:
+
+- **Mock DOM Elements**: Create mock containers and canvas elements in test setup
+- **Test Initialization**: Verify components create required DOM elements
+- **Test Setup Methods**: Verify `setCamera()`, `setSystems()` methods work correctly
+- **Test Update Methods**: Verify `update()` methods handle various states gracefully
+- **Test Disposal**: Verify cleanup methods work correctly
+- **Handle Canvas Warnings**: Canvas `getContext()` warnings in test environment are expected and can be ignored
+
+Example tests: See `src/ui/__tests__/Minimap.test.ts` and `src/ui/__tests__/Compass.test.ts`
+
 ## Best Practices
 
 1. **Test one thing at a time** - Each test should verify a single behavior
@@ -95,6 +109,7 @@ const servant = createTestServant('servant_1', createVector3(0, 0, 0));
 4. **Mock external dependencies** - Don't test Babylon.js, test your game logic
 5. **Keep tests fast** - Unit tests should run in milliseconds
 6. **Test edge cases** - Don't just test happy paths
+7. **Test UI components** - Verify initialization, updates, and cleanup for all UI components
 
 ## Continuous Integration
 

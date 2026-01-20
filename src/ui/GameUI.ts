@@ -7,8 +7,13 @@ import { WaveTimer } from './WaveTimer';
 import { PowerLevelDisplay } from './PowerLevelDisplay';
 import { BuildingMenu } from './BuildingMenu';
 import { WorkQueuePanel } from './WorkQueuePanel';
+import { Minimap } from './Minimap';
+import { Compass } from './Compass';
 import { WaveSystem } from '../systems/WaveSystem';
 import { BuildingSystem } from '../systems/BuildingSystem';
+import { ResourceSystem } from '../systems/ResourceSystem';
+import { ServantSystem } from '../systems/ServantSystem';
+import { ArcRotateCamera } from '@babylonjs/core';
 import { Tower } from '../entities/Tower';
 import { Vector3 } from '@babylonjs/core';
 
@@ -18,11 +23,16 @@ export class GameUI {
   private powerLevelDisplay: PowerLevelDisplay;
   private buildingMenu: BuildingMenu;
   private workQueuePanel: WorkQueuePanel;
+  private minimap!: Minimap;
+  private compass!: Compass;
   private gameOverModal: HTMLDivElement | null = null;
 
   constructor(
     waveSystem: WaveSystem,
-    buildingSystem: BuildingSystem
+    buildingSystem: BuildingSystem,
+    resourceSystem?: ResourceSystem,
+    servantSystem?: ServantSystem,
+    camera?: ArcRotateCamera
   ) {
     // Create UI containers if they don't exist
     this.createUIContainers();
@@ -33,6 +43,15 @@ export class GameUI {
     this.powerLevelDisplay = new PowerLevelDisplay('power-level-display');
     this.buildingMenu = new BuildingMenu('building-menu', buildingSystem);
     this.workQueuePanel = new WorkQueuePanel('work-queue-panel');
+    this.minimap = new Minimap('minimap');
+    this.compass = new Compass('compass');
+
+    // Set up minimap and compass with systems and camera
+    if (resourceSystem && servantSystem && camera) {
+      this.minimap.setSystems(buildingSystem, resourceSystem, servantSystem);
+      this.minimap.setCamera(camera);
+      this.compass.setCamera(camera);
+    }
 
     // Set up wave trigger callback
     this.waveTimer.setTriggerCallback(() => {
@@ -87,6 +106,20 @@ export class GameUI {
       workQueueDiv.style.display = 'none';
       document.body.appendChild(workQueueDiv);
     }
+
+    // Minimap
+    if (!document.getElementById('minimap')) {
+      const minimapDiv = document.createElement('div');
+      minimapDiv.id = 'minimap';
+      document.body.appendChild(minimapDiv);
+    }
+
+    // Compass
+    if (!document.getElementById('compass')) {
+      const compassDiv = document.createElement('div');
+      compassDiv.id = 'compass';
+      document.body.appendChild(compassDiv);
+    }
   }
 
   private createBuildingMenuButton(): void {
@@ -118,6 +151,24 @@ export class GameUI {
     // Update work queue panel if visible
     if (this.workQueuePanel.isPanelVisible()) {
       this.workQueuePanel.update();
+    }
+  }
+
+  /**
+   * Update minimap
+   */
+  updateMinimap(): void {
+    if (this.minimap) {
+      this.minimap.update();
+    }
+  }
+
+  /**
+   * Update compass
+   */
+  updateCompass(): void {
+    if (this.compass) {
+      this.compass.update();
     }
   }
 

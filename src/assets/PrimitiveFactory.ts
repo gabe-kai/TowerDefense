@@ -191,11 +191,20 @@ export class PrimitiveFactory {
    * Create a servant primitive
    */
   createServant(name: string, position: Vector3): Mesh {
-    const servant = this.createCylinder(name, {
-      size: 0.5,
-      position,
-      materialId: 'servant'
-    });
+    // Create a taller, more visible servant
+    if (!this.scene) {
+      throw new Error('PrimitiveFactory not initialized with scene');
+    }
+    
+    const radius = 0.4;
+    const height = 1.2; // Taller servant for better visibility
+    const servant = Mesh.CreateCylinder(name, height, radius, radius, 16, 1, this.scene);
+    servant.isPickable = true; // Enable raycasting/picking
+    servant.position = position;
+    
+    // Apply material
+    const material = this.materialLibrary.getBabylonMaterial('servant', this.scene);
+    servant.material = material;
 
     // Register in catalog
     this.catalog.registerAsset(

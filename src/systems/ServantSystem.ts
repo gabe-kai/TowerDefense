@@ -2,7 +2,7 @@
  * Servant System - Servant AI, command queue, recruitment
  */
 
-import { Scene, Vector3 } from '@babylonjs/core';
+import { Scene, Vector3, Mesh, StandardMaterial, Color3, Animation } from '@babylonjs/core';
 import { Servant } from '../entities/Servant';
 import { Resource } from '../entities/Resource';
 import { GameStateManager } from '../core/GameState';
@@ -43,7 +43,7 @@ export class ServantSystem {
    * Create a new servant at position
    */
   createServant(position: Vector3, player: 'player' | 'ai' = 'player'): Servant {
-    const servant = new Servant(`${player}_servant_${this.servants.length}`, position);
+    const servant = new Servant(`${player}_servant_${this.servants.length}`, position, this.scene);
     this.servants.push(servant);
     
     if (player === 'player') {
@@ -137,40 +137,51 @@ export class ServantSystem {
    */
   update(): void {
     const currentTime = Date.now();
+    
+    // Initialize lastUpdateTime on first call
+    if (this.lastUpdateTime === 0) {
+      this.lastUpdateTime = currentTime;
+      return; // Skip first frame to get proper deltaTime next frame
+    }
+    
     const deltaTime = (currentTime - this.lastUpdateTime) / 1000; // Convert to seconds
     this.lastUpdateTime = currentTime;
 
-    if (deltaTime > 0.1) {
-      // Limit delta time to prevent large jumps
-      this.servants.forEach(servant => {
-        servant.update(Math.min(deltaTime, 0.1));
+    // Always update, but limit delta time to prevent large jumps
+    const clampedDeltaTime = Math.min(deltaTime, 0.1);
+    
+    this.servants.forEach(servant => {
+      servant.update(clampedDeltaTime);
+      
+      // Check if servant delivered resource (called after update, when state is IDLE and at home)
+      const resource = servant.deliverResource();
+      if (resource) {
+        // Add resource to player inventory
+        const resourceType = resource.getType() as ResourceType;
+        const amount = resource.getAmount();
+        const player = servant.getMesh().name.startsWith('player') ? 'player' : 'ai';
+        this.stateManager.addResource(player, resourceType, amount);
+        this.logger.info('Resource delivered to tower', { player, type: resourceType, amount });
         
-        // Check if servant delivered resource
-        const resource = servant.deliverResource();
-        if (resource) {
-          // Add resource to player inventory
-          const resourceType = resource.getType() as ResourceType;
-          const amount = resource.getAmount();
-          const player = servant.getMesh().name.startsWith('player') ? 'player' : 'ai';
-          this.stateManager.addResource(player, resourceType, amount);
-          this.logger.debug('Resource delivered', { player, type: resourceType, amount });
-          
-          // Complete any work queue tasks for this resource
-          const tasks = this.workQueue.getAllTasks();
-          tasks.forEach(task => {
-            if (task.type === 'collect' && 
-                task.target instanceof Resource && 
-                task.target === resource && 
-                task.assignedServant === servant) {
-              this.workQueue.completeTask(task.id);
-            }
-          });
-        }
-      });
+        // Show delivery feedback
+        this.showDeliveryFeedback(servant.getPosition(), resourceType, amount);
+        
+        // Complete any work queue tasks for this resource
+        const tasks = this.workQueue.getAllTasks();
+        tasks.forEach(task => {
+          if (task.type === 'collect' && 
+              task.target instanceof Resource && 
+              task.target === resource && 
+              task.assignedServant === servant) {
+            this.workQueue.completeTask(task.id);
+            this.logger.debug('Work queue task completed', { taskId: task.id, resourceType });
+          }
+        });
+      }
+    });
 
-      // Assign unassigned tasks to available servants
-      this.assignTasksToServants();
-    }
+    // Assign unassigned tasks to available servants
+    this.assignTasksToServants();
   }
 
   /**
@@ -184,8 +195,17 @@ export class ServantSystem {
 
     const availableServants = this.getAvailableServants('player');
     if (availableServants.length === 0) {
+      this.logger.debug('No available servants for task assignment', { 
+        unassignedTasks: unassignedTasks.length,
+        totalServants: this.servants.length 
+      });
       return;
     }
+
+    this.logger.debug('Assigning tasks to servants', { 
+      unassignedTasks: unassignedTasks.length,
+      availableServants: availableServants.length 
+    });
 
     // Assign tasks to available servants
     unassignedTasks.forEach(task => {
@@ -214,12 +234,25 @@ export class ServantSystem {
         }
       });
 
-      if (nearest) {
-        this.workQueue.assignTask(task.id, nearest);
-        // Remove from available list
-        const index = availableServants.indexOf(nearest);
-        if (index > -1) {
-          availableServants.splice(index, 1);
+      if (nearest !== null) {
+        const assigned = this.workQueue.assignTask(task.id, nearest);
+        if (assigned) {
+          // TypeScript workaround: extract values to avoid narrowing issues
+          const nearestServant: Servant = nearest;
+          const servantName = nearestServant.getMesh().name;
+          const servantState = nearestServant.getState();
+          this.logger.debug('Task assigned to servant', { 
+            taskId: task.id, 
+            servantName,
+            servantState
+          });
+          // Remove from available list
+          const index = availableServants.indexOf(nearestServant);
+          if (index > -1) {
+            availableServants.splice(index, 1);
+          }
+        } else {
+          this.logger.warn('Failed to assign task to servant', { taskId: task.id });
         }
       }
     });
@@ -238,5 +271,71 @@ export class ServantSystem {
   clear(): void {
     this.servants.forEach(s => s.dispose());
     this.servants = [];
+  }
+
+  /**
+   * Show visual feedback when resource is delivered
+   */
+  private showDeliveryFeedback(position: Vector3, resourceType: ResourceType, amount: number): void {
+    if (!this.scene) {
+      return;
+    }
+
+    // Create a floating sphere that rises and fades
+    const feedbackMesh = Mesh.CreateSphere('delivery_feedback', 8, 0.4, this.scene);
+    feedbackMesh.position = position.clone();
+    feedbackMesh.position.y += 0.5;
+
+    // Color based on resource type
+    const material = new StandardMaterial('delivery_feedback_material', this.scene);
+    const colorMap: Record<ResourceType, Color3> = {
+      [ResourceType.WOOD]: new Color3(0.6, 0.4, 0.2),
+      [ResourceType.STONE]: new Color3(0.5, 0.5, 0.5),
+      [ResourceType.GOLD]: new Color3(1.0, 0.84, 0.0),
+      [ResourceType.CRYSTAL]: new Color3(0.5, 0.0, 1.0),
+      [ResourceType.ESSENCE]: new Color3(0.0, 1.0, 0.5),
+      [ResourceType.MANA]: new Color3(0.0, 0.5, 1.0)
+    };
+
+    material.diffuseColor = colorMap[resourceType] || new Color3(1, 1, 1);
+    material.emissiveColor = colorMap[resourceType] || new Color3(0.5, 0.5, 0.5);
+    material.emissiveColor.scale(0.8);
+    material.alpha = 1.0; // Start fully opaque
+    feedbackMesh.material = material;
+
+    // Animate: rise up and fade out
+    const riseAnimation = new Animation(
+      'delivery_rise',
+      'position.y',
+      30,
+      Animation.ANIMATIONTYPE_FLOAT,
+      Animation.ANIMATIONLOOPMODE_CONSTANT
+    );
+    riseAnimation.setKeys([
+      { frame: 0, value: position.y + 0.5 },
+      { frame: 30, value: position.y + 2.5 }
+    ]);
+
+    const fadeAnimation = new Animation(
+      'delivery_fade',
+      'material.alpha',
+      30,
+      Animation.ANIMATIONTYPE_FLOAT,
+      Animation.ANIMATIONLOOPMODE_CONSTANT
+    );
+    fadeAnimation.setKeys([
+      { frame: 0, value: 1.0 },
+      { frame: 30, value: 0.0 }
+    ]);
+
+    feedbackMesh.animations.push(riseAnimation, fadeAnimation);
+
+    // Start animation
+    this.scene.beginAnimation(feedbackMesh, 0, 30, false, 1.0, () => {
+      // Cleanup when animation completes
+      feedbackMesh.dispose();
+    });
+
+    this.logger.debug('Delivery feedback shown', { resourceType, amount, position });
   }
 }

@@ -25,6 +25,14 @@ Project status updates, integration summaries, and milestone reports.
 **Current Status Documents:**
 - `TESTING_AND_LOGGING_SUMMARY.md` - Initial logging and testing system summary
 - `LOGGING_AND_TESTING_INTEGRATION.md` - Integration completion report
+- `PHASE1_STEP2_COMPLETE.md` - Phase 1 Step 2 (Servant Visual Feedback) completion report
+- `MINIMAP_AND_COMPASS_COMPLETE.md` - Minimap and Compass implementation completion report
+
+### `/screenshots`
+Game screenshots documenting milestones and features.
+
+**Current Screenshots:**
+- `Phase_01_Complete.png` - Screenshot of Phase 1 completion showing minimap, compass, servant visual feedback, and game UI
 
 ## Quick Links
 

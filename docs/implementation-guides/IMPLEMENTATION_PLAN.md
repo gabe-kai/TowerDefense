@@ -37,15 +37,21 @@
    - ✅ Selection clearing when clicking empty space
    - **Implementation**: `InteractionSystem` handles all player input with Babylon.js raycasting and `HighlightLayer` for visual feedback
 
-2. **Servant Visual Feedback**
-   - Show servant movement clearly
-   - Visual indicator when servant is carrying resource
-   - Show resource delivery animation/feedback
+2. ✅ **Servant Visual Feedback** - **COMPLETE**
+   - ✅ Visual indicator when servant is carrying resource (floating colored sphere above servant's head)
+   - ✅ Movement glow effect (subtle blue emissive glow when moving)
+   - ✅ Working animation (bobbing animation when working at resource location)
+   - ✅ Resource delivery animation (rising and fading sphere when resource is delivered)
+   - **Implementation**: `Servant` entity manages carrying indicator, movement glow, and working state, `ServantSystem` handles delivery feedback
 
-3. **Resource Collection Verification**
-   - Test that servants actually collect and deliver resources
-   - Verify resources are added to inventory
-   - Fix any bugs in delivery system
+3. ✅ **Resource Collection Work Flow** - **COMPLETE**
+   - ✅ Servant dispatched to work spot when task added to work queue
+   - ✅ Working animation at resource location (1 second bobbing)
+   - ✅ Resource deducted from patch when collected
+   - ✅ Servant carries resource back to tower with visual indicator
+   - ✅ Resource delivered to tower and added to inventory
+   - ✅ Work queue task completion
+   - **Implementation**: Complete work flow from queue → dispatch → work → collect → return → deliver
 
 **Why First**: Without this, players can't actually play the game. Everything else depends on resource collection working.
 
@@ -164,10 +170,19 @@
 
 **Phase 1, Step 1 is complete!** ✅ Click-to-collect resources is implemented with full raycasting, hover feedback, and click effects.
 
-**Next**: Continue with Phase 1, Step 2: Servant Visual Feedback
-- Show servant movement clearly
-- Visual indicator when servant is carrying resource
-- Show resource delivery animation/feedback
+**Phase 1, Step 2 is complete!** ✅ Servant visual feedback is implemented with carrying indicators, movement glow, working animations, and delivery animations.
+
+**Phase 1, Step 3 is complete!** ✅ Complete resource collection work flow is implemented - servants dispatch, work at resources, collect, carry back, and deliver to tower. All bugs fixed.
+
+**Bonus Features Complete!** ✅ Minimap and Compass implemented:
+- ✅ Minimap showing game world overview (towers, resources, servants, camera position/direction)
+- ✅ Compass overlay showing camera direction with cardinal directions
+- ✅ Real-time updates synchronized with camera movement
+
+**Next**: Continue with Phase 2: Building System Polish
+- Visual building placement
+- Building placement preview  
+- Tower floor visualization
 
 Would you like me to:
 1. Continue with Phase 1, Step 2 (servant visual feedback)?

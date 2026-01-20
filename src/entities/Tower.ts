@@ -148,13 +148,19 @@ export class Tower {
    * Check if tower is destroyed
    */
   isDestroyed(): boolean {
-    // Check base
+    // Check base - if base is destroyed, tower is destroyed
     const baseComponent = this.baseMesh.metadata?.component as BuildingComponent | undefined;
     if (baseComponent && baseComponent.isDestroyed()) {
       return true;
     }
 
-    // Check if all floors destroyed
+    // If no floors, tower is healthy (base is healthy and no floors to check)
+    if (this.floors.length === 0) {
+      return false;
+    }
+
+    // If there are floors, tower is destroyed only if ALL floors are destroyed
+    // (Base must be healthy at this point, otherwise we would have returned above)
     return this.floors.every(floor => floor.component.isDestroyed());
   }
 
