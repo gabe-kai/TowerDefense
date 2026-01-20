@@ -143,11 +143,30 @@ class MockColor3 {
       dispose: vi.fn()
     }))
   },
-  StandardMaterial: vi.fn().mockImplementation(() => ({
+  StandardMaterial: vi.fn().mockImplementation((name: string, scene: any) => ({
+    name,
     diffuseColor: new MockColor3(1, 1, 1),
     emissiveColor: new MockColor3(0, 0, 0),
     roughness: 0.5,
     metallic: 0.0,
-    dispose: vi.fn()
-  }))
+    alpha: 1.0,
+    animations: [],
+    dispose: vi.fn(),
+    _scene: scene || { getUniqueId: vi.fn(() => 1) }
+  })),
+  Animation: vi.fn().mockImplementation(() => ({
+    setKeys: vi.fn()
+  })),
+  PointerEventTypes: {
+    POINTERMOVE: 1,
+    POINTERDOWN: 2
+  }
+};
+
+// Add Animation constants
+(global as any).Babylon.Animation = {
+  ...(global as any).Babylon.Animation,
+  ANIMATIONTYPE_VECTOR3: 'ANIMATIONTYPE_VECTOR3',
+  ANIMATIONTYPE_FLOAT: 'ANIMATIONTYPE_FLOAT',
+  ANIMATIONLOOPMODE_CONSTANT: 'ANIMATIONLOOPMODE_CONSTANT'
 };

@@ -8,6 +8,7 @@ import { Resource } from '../entities/Resource';
 import { GameStateManager } from '../core/GameState';
 import { AssetCatalog, AssetCategory, AssetType } from '../assets/AssetCatalog';
 import { ResourceType } from '../components/ResourceComponent';
+import { WorkQueue } from './WorkQueue';
 import { createCategoryLogger } from '../utils/Logger';
 
 export class ServantSystem {
@@ -15,6 +16,7 @@ export class ServantSystem {
   private servants: Servant[] = [];
   private stateManager: GameStateManager;
   private catalog: AssetCatalog;
+  private workQueue: WorkQueue;
   private lastUpdateTime: number = 0;
   private logger = createCategoryLogger('ServantSystem');
 
@@ -22,6 +24,7 @@ export class ServantSystem {
     this.scene = scene;
     this.stateManager = GameStateManager.getInstance();
     this.catalog = AssetCatalog.getInstance();
+    this.workQueue = WorkQueue.getInstance();
     this.registerServantAssets();
   }
 
@@ -151,9 +154,75 @@ export class ServantSystem {
           const player = servant.getMesh().name.startsWith('player') ? 'player' : 'ai';
           this.stateManager.addResource(player, resourceType, amount);
           this.logger.debug('Resource delivered', { player, type: resourceType, amount });
+          
+          // Complete any work queue tasks for this resource
+          const tasks = this.workQueue.getAllTasks();
+          tasks.forEach(task => {
+            if (task.type === 'collect' && 
+                task.target instanceof Resource && 
+                task.target === resource && 
+                task.assignedServant === servant) {
+              this.workQueue.completeTask(task.id);
+            }
+          });
         }
       });
+
+      // Assign unassigned tasks to available servants
+      this.assignTasksToServants();
     }
+  }
+
+  /**
+   * Assign unassigned tasks to available servants
+   */
+  private assignTasksToServants(): void {
+    const unassignedTasks = this.workQueue.getTasksByStatus(false);
+    if (unassignedTasks.length === 0) {
+      return;
+    }
+
+    const availableServants = this.getAvailableServants('player');
+    if (availableServants.length === 0) {
+      return;
+    }
+
+    // Assign tasks to available servants
+    unassignedTasks.forEach(task => {
+      if (availableServants.length === 0) {
+        return; // No more available servants
+      }
+
+      // Find nearest available servant
+      let nearest: Servant | null = null;
+      let nearestDistance = Infinity;
+      const targetPosition = task.type === 'collect' && task.target instanceof Resource
+        ? task.target.getPosition()
+        : task.target instanceof Vector3
+        ? task.target
+        : null;
+
+      if (!targetPosition) {
+        return;
+      }
+
+      availableServants.forEach(servant => {
+        const distance = Vector3.Distance(targetPosition, servant.getPosition());
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearest = servant;
+        }
+      });
+
+      if (nearest) {
+        this.workQueue.assignTask(task.id, nearest);
+        // Remove from available list
+        const index = availableServants.indexOf(nearest);
+        if (index > -1) {
+          availableServants.splice(index, 1);
+        }
+      }
+    });
   }
 
   /**

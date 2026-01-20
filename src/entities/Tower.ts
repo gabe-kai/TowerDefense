@@ -31,6 +31,7 @@ export class Tower {
 
     // Create base (cottage)
     this.baseMesh = this.primitiveFactory.createTowerBase(`${owner}_tower_base`, position);
+    this.baseMesh.metadata = { ...this.baseMesh.metadata, tower: this };
     this.registerTowerAssets();
   }
 
@@ -71,6 +72,9 @@ export class Tower {
         materialId: this.getMaterialForBuildingType(buildingType)
       }
     );
+
+    // Add tower metadata to floor mesh
+    floorMesh.metadata = { ...floorMesh.metadata, tower: this, building: true, buildingType };
 
     const floor: Floor = {
       level: floorLevel,

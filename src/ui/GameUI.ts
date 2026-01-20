@@ -6,6 +6,7 @@ import { ResourceDisplay } from './ResourceDisplay';
 import { WaveTimer } from './WaveTimer';
 import { PowerLevelDisplay } from './PowerLevelDisplay';
 import { BuildingMenu } from './BuildingMenu';
+import { WorkQueuePanel } from './WorkQueuePanel';
 import { WaveSystem } from '../systems/WaveSystem';
 import { BuildingSystem } from '../systems/BuildingSystem';
 import { Tower } from '../entities/Tower';
@@ -16,6 +17,7 @@ export class GameUI {
   private waveTimer: WaveTimer;
   private powerLevelDisplay: PowerLevelDisplay;
   private buildingMenu: BuildingMenu;
+  private workQueuePanel: WorkQueuePanel;
   private gameOverModal: HTMLDivElement | null = null;
 
   constructor(
@@ -30,6 +32,7 @@ export class GameUI {
     this.waveTimer = new WaveTimer('wave-timer', waveSystem);
     this.powerLevelDisplay = new PowerLevelDisplay('power-level-display');
     this.buildingMenu = new BuildingMenu('building-menu', buildingSystem);
+    this.workQueuePanel = new WorkQueuePanel('work-queue-panel');
 
     // Set up wave trigger callback
     this.waveTimer.setTriggerCallback(() => {
@@ -42,6 +45,9 @@ export class GameUI {
 
     // Create building menu toggle button
     this.createBuildingMenuButton();
+    
+    // Create work queue toggle button
+    this.createWorkQueueButton();
   }
 
   private createUIContainers(): void {
@@ -72,6 +78,15 @@ export class GameUI {
       menuDiv.id = 'building-menu';
       document.body.appendChild(menuDiv);
     }
+
+    // Work queue panel
+    if (!document.getElementById('work-queue-panel')) {
+      const workQueueDiv = document.createElement('div');
+      workQueueDiv.id = 'work-queue-panel';
+      workQueueDiv.className = 'work-queue-panel';
+      workQueueDiv.style.display = 'none';
+      document.body.appendChild(workQueueDiv);
+    }
   }
 
   private createBuildingMenuButton(): void {
@@ -83,6 +98,15 @@ export class GameUI {
     document.body.appendChild(button);
   }
 
+  private createWorkQueueButton(): void {
+    const button = document.createElement('button');
+    button.id = 'work-queue-toggle';
+    button.textContent = 'Work Queue';
+    button.className = 'work-queue-toggle';
+    button.onclick = () => this.workQueuePanel.toggle();
+    document.body.appendChild(button);
+  }
+
   /**
    * Update all UI elements
    */
@@ -90,6 +114,11 @@ export class GameUI {
     this.resourceDisplay.update();
     this.waveTimer.update();
     this.powerLevelDisplay.update(playerTower, aiTower);
+    
+    // Update work queue panel if visible
+    if (this.workQueuePanel.isPanelVisible()) {
+      this.workQueuePanel.update();
+    }
   }
 
   /**
