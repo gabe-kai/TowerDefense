@@ -10,6 +10,7 @@ import { BuildingSystem } from '../systems/BuildingSystem';
 import { EnemySystem } from '../systems/EnemySystem';
 import { WaveSystem } from '../systems/WaveSystem';
 import { AISystem } from '../systems/AISystem';
+import { InteractionSystem } from '../systems/InteractionSystem';
 import { GameUI } from '../ui/GameUI';
 import { PowerCalculator } from '../utils/PowerCalculator';
 import { Vector3 } from '@babylonjs/core';
@@ -28,6 +29,7 @@ export class Game {
   private enemySystem: EnemySystem | null = null;
   private waveSystem: WaveSystem | null = null;
   private aiSystem: AISystem | null = null;
+  private interactionSystem: InteractionSystem | null = null;
   private gameUI: GameUI | null = null;
   private powerCalculator: PowerCalculator;
   private logger = createCategoryLogger('Game');
@@ -61,6 +63,14 @@ export class Game {
     this.enemySystem = new EnemySystem(scene);
     this.waveSystem = new WaveSystem(this.enemySystem);
     this.aiSystem = new AISystem(
+      this.servantSystem,
+      this.resourceSystem,
+      this.buildingSystem
+    );
+    
+    // Initialize interaction system (handles clicks, hover)
+    this.interactionSystem = new InteractionSystem(
+      scene,
       this.servantSystem,
       this.resourceSystem,
       this.buildingSystem
@@ -145,10 +155,11 @@ export class Game {
       return;
     }
 
-    // Handle resource clicks (simplified - would use raycasting in full implementation)
-    this.handleResourceClicks();
-
     // Update systems
+    if (this.interactionSystem) {
+      this.interactionSystem.update();
+    }
+
     if (this.servantSystem) {
       this.servantSystem.update();
     }
@@ -186,14 +197,6 @@ export class Game {
     this.checkWinConditions();
   }
 
-  /**
-   * Handle resource clicks (simplified implementation)
-   */
-  private handleResourceClicks(): void {
-    // In a full implementation, this would use raycasting to detect clicks on resources
-    // For MVP, we'll use a simple approach: click anywhere near a resource to collect it
-    // This can be enhanced later with proper 3D picking
-  }
 
   /**
    * Check win/loss conditions
@@ -285,6 +288,9 @@ export class Game {
    */
   dispose(): void {
     this.isRunning = false;
+    if (this.interactionSystem) {
+      this.interactionSystem.dispose();
+    }
     if (this.sceneManager) {
       this.sceneManager.dispose();
     }

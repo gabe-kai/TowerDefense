@@ -48,6 +48,7 @@ export class PrimitiveFactory {
 
     const size = options.size ?? 1;
     const box = Mesh.CreateBox(name, size, this.scene);
+    box.isPickable = true; // Enable raycasting/picking
     
     if (options.position) {
       box.position = options.position;
@@ -67,6 +68,7 @@ export class PrimitiveFactory {
 
     const size = options.size ?? 1;
     const sphere = Mesh.CreateSphere(name, 16, size, this.scene);
+    sphere.isPickable = true; // Enable raycasting/picking
     
     if (options.position) {
       sphere.position = options.position;
@@ -86,6 +88,7 @@ export class PrimitiveFactory {
 
     const size = options.size ?? 1;
     const cylinder = Mesh.CreateCylinder(name, size, size, size, 16, 1, this.scene);
+    cylinder.isPickable = true; // Enable raycasting/picking
     
     if (options.position) {
       cylinder.position = options.position;
@@ -104,6 +107,7 @@ export class PrimitiveFactory {
     }
 
     const ground = Mesh.CreateGround(name, width, height, 2, this.scene);
+    ground.isPickable = false; // Ground should not be pickable (to allow clicking through to objects)
     
     if (options.position) {
       ground.position = options.position;

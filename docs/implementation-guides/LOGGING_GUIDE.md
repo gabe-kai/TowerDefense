@@ -145,6 +145,32 @@ logger.warn('Wave triggered early');
 logger.error('Wave spawning failed', error);
 ```
 
+### Interaction System
+```typescript
+const logger = createCategoryLogger('InteractionSystem');
+
+logger.info('InteractionSystem initialized');
+logger.info('Resource click - servant commanded', { resourceType, position });
+logger.warn('Resource click - no available servant', { resourceType, position });
+logger.info('Resource added to work queue', { resourceType });
+logger.info('InteractionSystem disposed');
+```
+
+### Work Queue System
+```typescript
+const logger = createCategoryLogger('WorkQueue');
+
+logger.info('WorkQueue initialized');
+logger.info('Task added to work queue', { taskId, type, priority, queueLength });
+logger.debug('Task removed from work queue', { taskId });
+logger.debug('Task moved up in queue', { taskId, newPriority });
+logger.debug('Task moved down in queue', { taskId, newPriority });
+logger.info('Task assigned to servant', { taskId, servantName, taskType });
+logger.warn('Cannot assign task - resource already collected', { taskId });
+logger.info('Task completed', { taskId, taskType });
+logger.info('Work queue cleared');
+```
+
 ## Performance
 
 - Logging is **asynchronous** to avoid blocking game loop

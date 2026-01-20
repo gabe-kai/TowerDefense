@@ -17,6 +17,7 @@ Technical guides for implementing features, using systems, and development pract
 - `IMPLEMENTATION_PLAN.md` - Overall game implementation plan and phases
 - `LOGGING_GUIDE.md` - How to use the logging system
 - `TESTING_GUIDE.md` - Testing practices and guidelines
+- `SELECTABLE_OBJECTS_GUIDE.md` - How to add new selectable objects to the interaction system
 
 ### `/status`
 Project status updates, integration summaries, and milestone reports.
@@ -30,3 +31,4 @@ Project status updates, integration summaries, and milestone reports.
 - [Implementation Plan](implementation-guides/IMPLEMENTATION_PLAN.md)
 - [Logging Guide](implementation-guides/LOGGING_GUIDE.md)
 - [Testing Guide](implementation-guides/TESTING_GUIDE.md)
+- [Selectable Objects Guide](implementation-guides/SELECTABLE_OBJECTS_GUIDE.md)

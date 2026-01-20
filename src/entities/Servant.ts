@@ -216,6 +216,13 @@ export class Servant {
   }
 
   /**
+   * Get command queue
+   */
+  getCommandQueue(): Command[] {
+    return [...this.commandQueue];
+  }
+
+  /**
    * Check if servant is available for new commands
    */
   isAvailable(): boolean {
