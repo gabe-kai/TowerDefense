@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Minimap } from '../Minimap';
-import { ArcRotateCamera, Vector3 } from '@babylonjs/core';
+import { FreeCamera, Vector3 } from '@babylonjs/core';
 import { BuildingSystem } from '../../systems/BuildingSystem';
 import { ResourceSystem } from '../../systems/ResourceSystem';
 import { ServantSystem } from '../../systems/ServantSystem';
@@ -16,7 +16,7 @@ document.body.appendChild(mockContainer);
 
 describe('Minimap', () => {
   let minimap: Minimap;
-  let mockCamera: ArcRotateCamera;
+  let mockCamera: FreeCamera;
   let mockBuildingSystem: BuildingSystem;
   let mockResourceSystem: ResourceSystem;
   let mockServantSystem: ServantSystem;
@@ -25,10 +25,10 @@ describe('Minimap', () => {
     // Clear container
     mockContainer.innerHTML = '';
 
-    // Create mock camera
+    // Create mock camera (FreeCamera uses rotation.y for yaw)
     mockCamera = {
       position: new Vector3(0, 10, 0),
-      alpha: 0,
+      rotation: { x: 0, y: 0, z: 0 }, // FreeCamera uses rotation.y for yaw
       getTarget: vi.fn(() => Vector3.Zero())
     } as any;
 

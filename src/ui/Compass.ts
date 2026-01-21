@@ -2,13 +2,13 @@
  * Compass - Shows camera direction using cardinal directions
  */
 
-import { ArcRotateCamera } from '@babylonjs/core';
+import { FreeCamera } from '@babylonjs/core';
 
 export class Compass {
   private container: HTMLDivElement;
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-  private camera: ArcRotateCamera | null = null;
+  private camera: FreeCamera | null = null;
   
   private canvasSize = 60; // Compass size in pixels (bigger than 40, but still compact)
   private radius = 24; // Compass radius (scaled proportionally)
@@ -53,7 +53,7 @@ export class Compass {
   /**
    * Set camera reference for tracking
    */
-  setCamera(camera: ArcRotateCamera): void {
+  setCamera(camera: FreeCamera): void {
     this.camera = camera;
   }
 
@@ -81,10 +81,11 @@ export class Compass {
     this.ctx.lineWidth = 2;
     this.ctx.stroke();
 
-    // Get camera rotation (alpha is horizontal rotation around Y axis)
+    // Get camera rotation (yaw is horizontal rotation around Y axis)
+    // FreeCamera uses rotation.y for yaw
     // Convert to degrees and adjust for compass (0 = North, 90 = East, etc.)
-    const alpha = this.camera.alpha;
-    const angleDegrees = (alpha * 180 / Math.PI) % 360;
+    const yaw = this.camera.rotation.y;
+    const angleDegrees = (yaw * 180 / Math.PI) % 360;
     const compassAngle = (angleDegrees + 90) % 360; // Adjust so 0 = North
 
     // Draw cardinal directions

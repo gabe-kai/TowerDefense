@@ -12,6 +12,8 @@
 - AI opponent logic
 - UI displays (resources, wave timer, power level)
 - Win/loss condition checking
+- **Camera controls** - Full FPS-style camera with keyboard and mouse controls
+- **Terrain system** - Heightmap-based terrain with river valley and hills
 
 ### ❌ What's Missing (Critical Gameplay Features)
 
@@ -54,6 +56,47 @@
    - **Implementation**: Complete work flow from queue → dispatch → work → collect → return → deliver
 
 **Why First**: Without this, players can't actually play the game. Everything else depends on resource collection working.
+
+---
+
+### Phase 1.5: Camera Controls & Terrain (COMPLETE - Unplanned Addition)
+**Goal**: Provide intuitive 3D navigation and believable terrain
+
+1. ✅ **Camera System Overhaul** - **COMPLETE**
+   - ✅ Changed from ArcRotateCamera to FreeCamera (FPS-style "eyeball" camera)
+   - ✅ Camera position is pivot point (center of sphere)
+   - ✅ Forward/back/left/right directions relative to camera view
+   - **Implementation**: Complete rewrite of camera system in `SceneManager.ts`
+
+2. ✅ **Keyboard Controls** - **COMPLETE**
+   - ✅ WASD movement (forward/backward/strafe relative to camera)
+   - ✅ Q/E yaw rotation (left/right around vertical axis)
+   - ✅ R/F pitch rotation (up/down around horizontal axis)
+   - ✅ All movement respects terrain height
+   - **Implementation**: Keyboard event handlers with deltaTime-based movement
+
+3. ✅ **Mouse Controls** - **COMPLETE**
+   - ✅ Middle-click + drag for orbit (rotate camera)
+   - ✅ Right-click + drag for pan (strafe camera)
+   - ✅ Mouse wheel for zoom (move forward/backward)
+   - ✅ Proper event handling with Babylon's pointer observable
+   - **Implementation**: Mouse event handlers integrated with Babylon's event system
+
+4. ✅ **Terrain System** - **COMPLETE**
+   - ✅ Heightmap-based terrain with procedural generation
+   - ✅ River valley with hills on both sides
+   - ✅ TerrainManager for height sampling and validation
+   - ✅ 3km × 3km map with 2km tower distance
+   - ✅ **Dramatic terrain generation** - Single deep gorge (East-West) with gentle slopes, South-North elevation ramp
+   - ✅ **Elevation-based colormap** - Custom shader material with elevation bands and slope-based coloring
+   - ✅ **Seeded randomization** - Deterministic terrain generation with unique but replayable maps
+   - ✅ **Raised elevation** - Entire landscape raised by 10m to make water less prominent
+   - ✅ **Structure placement on terrain** - All structures and resources drop to rest on terrain surface
+   - ✅ **Water/land placement rules** - Resources and structures respect terrain height (land-only vs water-allowed)
+   - ✅ **Tower placement bias** - Towers prefer higher ground with expanded placement radius (±500m, 20 samples)
+   - **Implementation**: `TerrainManager` wrapper for Babylon's `GroundMesh`, `ElevationColormap` shader material, `SeededRandom` utility
+
+**Why Added**: Camera controls are essential for 3D game navigation, and terrain provides context and scale. These were implemented as part of Phase 2 terrain work but are foundational systems.
 
 ---
 
@@ -178,6 +221,31 @@
 - ✅ Minimap showing game world overview (towers, resources, servants, camera position/direction)
 - ✅ Compass overlay showing camera direction with cardinal directions
 - ✅ Real-time updates synchronized with camera movement
+
+**Camera Controls Complete!** ✅ Comprehensive camera control system implemented:
+- ✅ Changed from ArcRotateCamera to FreeCamera (FPS-style "eyeball" camera)
+- ✅ WASD movement controls (forward/backward/strafe relative to camera view)
+- ✅ Q/E yaw rotation (left/right around vertical axis)
+- ✅ R/F pitch rotation (up/down around horizontal axis)
+- ✅ Middle-click + drag for orbit (rotate camera)
+- ✅ Right-click + drag for pan (strafe camera)
+- ✅ Mouse wheel for zoom (move forward/backward)
+- ✅ All movement respects terrain height
+- ✅ Updated Compass and Minimap to work with FreeCamera
+- ✅ Updated tests for new camera system
+- **Implementation**: Complete camera system overhaul in `SceneManager.ts` with keyboard and mouse controls
+- **Documentation**: See `docs/status/CAMERA_CONTROLS_COMPLETE.md` for full details
+
+**Terrain System Complete!** ✅ Comprehensive terrain system implemented:
+- ✅ Procedural heightmap generation with dramatic gorge and elevation ramp
+- ✅ Elevation-based colormap shader (sea level blue, sandy brown, grass/rock based on slope)
+- ✅ Seeded randomization for unique but replayable maps
+- ✅ Raised elevation (10m offset) to make water less prominent
+- ✅ Structure and resource placement on terrain surface
+- ✅ Water/land placement rules for different resource types
+- ✅ Tower placement bias toward higher ground with expanded radius
+- **Implementation**: `TerrainManager`, `ElevationColormap`, `SeededRandom`, enhanced `ResourceSystem` and `Game` placement logic
+- **Documentation**: See `docs/status/TERRAIN_SYSTEM_COMPLETE.md` for full details
 
 **Next**: Continue with Phase 2: Building System Polish
 - Visual building placement

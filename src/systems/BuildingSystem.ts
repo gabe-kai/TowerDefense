@@ -2,7 +2,7 @@
  * Building System - Building placement, upgrades, modular floors
  */
 
-import { Scene, Vector3 } from '@babylonjs/core';
+import { Scene, Vector3, Mesh } from '@babylonjs/core';
 import { Tower } from '../entities/Tower';
 import { BuildingComponent, BuildingType, RoomType } from '../components/BuildingComponent';
 import { BuildingValidator } from '../utils/BuildingValidator';
@@ -10,6 +10,7 @@ import { GameStateManager } from '../core/GameState';
 import { AssetCatalog, AssetCategory, AssetType } from '../assets/AssetCatalog';
 import { PowerCalculator } from '../utils/PowerCalculator';
 import { createCategoryLogger } from '../utils/Logger';
+import { PrimitiveFactory } from '../assets/PrimitiveFactory';
 
 export interface BuildingDefinition {
   type: BuildingType;
@@ -34,10 +35,11 @@ export class BuildingSystem {
   private scene: Scene;
   private playerTower: Tower | null = null;
   private aiTower: Tower | null = null;
-  private groundStructures: Map<string, { mesh: any; component: BuildingComponent }> = new Map();
+  private groundStructures: Map<string, { mesh: Mesh; component: BuildingComponent }> = new Map();
   private stateManager: GameStateManager;
   private catalog: AssetCatalog;
   private powerCalculator: PowerCalculator;
+  private primitiveFactory: PrimitiveFactory;
   private logger = createCategoryLogger('BuildingSystem');
 
   // Building definitions
@@ -48,6 +50,8 @@ export class BuildingSystem {
     this.stateManager = GameStateManager.getInstance();
     this.catalog = AssetCatalog.getInstance();
     this.powerCalculator = PowerCalculator.getInstance();
+    this.primitiveFactory = PrimitiveFactory.getInstance();
+    this.primitiveFactory.initialize(scene);
     
     this.initializeBuildingDefinitions();
     this.registerBuildingAssets();
@@ -156,10 +160,7 @@ export class BuildingSystem {
    * Create player tower
    */
   createPlayerTower(position: Vector3): Tower {
-    const tower = new Tower(position, 'player');
-    this.playerTower = tower;
-    
-    // Initialize base component
+    // Initialize base component first
     const baseDef = this.buildingDefinitions.get(BuildingType.TOWER_BASE)!;
     const baseComponent = new BuildingComponent(
       BuildingType.TOWER_BASE,
@@ -172,7 +173,10 @@ export class BuildingSystem {
         cost: baseDef.cost
       }
     );
-    tower.getBaseMesh().metadata = { component: baseComponent };
+    
+    // Create tower with base component (tower creates house separately)
+    const tower = new Tower(position, 'player', baseComponent);
+    this.playerTower = tower;
 
     this.stateManager.setTowerHeight('player', tower.getHeight());
     this.logger.info('Player tower created', { position, height: tower.getHeight() });
@@ -183,10 +187,7 @@ export class BuildingSystem {
    * Create AI tower
    */
   createAITower(position: Vector3): Tower {
-    const tower = new Tower(position, 'ai');
-    this.aiTower = tower;
-    
-    // Initialize base component
+    // Initialize base component first
     const baseDef = this.buildingDefinitions.get(BuildingType.TOWER_BASE)!;
     const baseComponent = new BuildingComponent(
       BuildingType.TOWER_BASE,
@@ -199,7 +200,10 @@ export class BuildingSystem {
         cost: baseDef.cost
       }
     );
-    tower.getBaseMesh().metadata = { component: baseComponent };
+    
+    // Create tower with base component (tower creates house separately)
+    const tower = new Tower(position, 'ai', baseComponent);
+    this.aiTower = tower;
 
     this.stateManager.setTowerHeight('ai', tower.getHeight());
     return tower;
@@ -297,8 +301,16 @@ export class BuildingSystem {
       }
     }
 
-    // Create structure (simplified for MVP - would use PrimitiveFactory)
-    // For now, just register it
+    // Create actual 3D mesh for the structure
+    const buildingMesh = this.primitiveFactory.createGroundStructure(buildingType, position);
+    buildingMesh.metadata = { 
+      ...buildingMesh.metadata,
+      buildingType,
+      player,
+      structureId: `${player}_${buildingType}_${Date.now()}`
+    };
+
+    // Create building component
     const component = new BuildingComponent(
       buildingType,
       def.roomType,
@@ -313,10 +325,17 @@ export class BuildingSystem {
       }
     );
 
-    const structureId = `${player}_${buildingType}_${Date.now()}`;
+    const structureId = buildingMesh.metadata.structureId;
     this.groundStructures.set(structureId, {
-      mesh: { position } as any, // Placeholder
+      mesh: buildingMesh,
       component
+    });
+
+    this.logger.info('Ground structure built', { 
+      buildingType, 
+      position, 
+      player,
+      structureId 
     });
 
     return true;

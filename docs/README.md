@@ -18,6 +18,8 @@ Technical guides for implementing features, using systems, and development pract
 - `LOGGING_GUIDE.md` - How to use the logging system
 - `TESTING_GUIDE.md` - Testing practices and guidelines
 - `SELECTABLE_OBJECTS_GUIDE.md` - How to add new selectable objects to the interaction system
+- `3D_GEOMETRY_GUIDE.md` - Babylon.js 3D geometry patterns, rotation pivots, custom meshes, and common pitfalls
+- `PHASE2_STRUCTURE_CHECKLIST.md` - Phase 2 structure design and testing checklist
 
 ### `/status`
 Project status updates, integration summaries, and milestone reports.
@@ -27,6 +29,8 @@ Project status updates, integration summaries, and milestone reports.
 - `LOGGING_AND_TESTING_INTEGRATION.md` - Integration completion report
 - `PHASE1_STEP2_COMPLETE.md` - Phase 1 Step 2 (Servant Visual Feedback) completion report
 - `MINIMAP_AND_COMPASS_COMPLETE.md` - Minimap and Compass implementation completion report
+- `CAMERA_CONTROLS_COMPLETE.md` - Camera controls system implementation completion report
+- `TERRAIN_SYSTEM_COMPLETE.md` - Terrain system implementation completion report
 
 ### `/screenshots`
 Game screenshots documenting milestones and features.
@@ -40,3 +44,5 @@ Game screenshots documenting milestones and features.
 - [Logging Guide](implementation-guides/LOGGING_GUIDE.md)
 - [Testing Guide](implementation-guides/TESTING_GUIDE.md)
 - [Selectable Objects Guide](implementation-guides/SELECTABLE_OBJECTS_GUIDE.md)
+- [3D Geometry Guide](implementation-guides/3D_GEOMETRY_GUIDE.md)
+- [Phase 2 Structure Checklist](implementation-guides/PHASE2_STRUCTURE_CHECKLIST.md)

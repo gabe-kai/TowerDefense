@@ -10,6 +10,7 @@ import { AssetCatalog, AssetCategory, AssetType } from '../assets/AssetCatalog';
 import { ResourceType } from '../components/ResourceComponent';
 import { WorkQueue } from './WorkQueue';
 import { createCategoryLogger } from '../utils/Logger';
+import { GameScale } from '../utils/GameScale';
 
 export class ServantSystem {
   private scene: Scene;
@@ -282,9 +283,9 @@ export class ServantSystem {
     }
 
     // Create a floating sphere that rises and fades
-    const feedbackMesh = Mesh.CreateSphere('delivery_feedback', 8, 0.4, this.scene);
+    const feedbackMesh = Mesh.CreateSphere('delivery_feedback', 8, GameScale.DELIVERY_FEEDBACK_SIZE, this.scene);
     feedbackMesh.position = position.clone();
-    feedbackMesh.position.y += 0.5;
+    feedbackMesh.position.y += GameScale.SERVANT_HEIGHT / 2; // Start at servant center height
 
     // Color based on resource type
     const material = new StandardMaterial('delivery_feedback_material', this.scene);
@@ -311,9 +312,10 @@ export class ServantSystem {
       Animation.ANIMATIONTYPE_FLOAT,
       Animation.ANIMATIONLOOPMODE_CONSTANT
     );
+    const startY = feedbackMesh.position.y;
     riseAnimation.setKeys([
-      { frame: 0, value: position.y + 0.5 },
-      { frame: 30, value: position.y + 2.5 }
+      { frame: 0, value: startY },
+      { frame: 30, value: startY + GameScale.DELIVERY_FEEDBACK_RISE }
     ]);
 
     const fadeAnimation = new Animation(

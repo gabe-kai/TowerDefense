@@ -5,6 +5,7 @@
 import { Mesh, Vector3 } from '@babylonjs/core';
 import { ResourceComponent, ResourceType } from '../components/ResourceComponent';
 import { PrimitiveFactory } from '../assets/PrimitiveFactory';
+import { GameScale } from '../utils/GameScale';
 
 export class Resource {
   private mesh: Mesh;
@@ -19,8 +20,17 @@ export class Resource {
     this.primitiveFactory = PrimitiveFactory.getInstance();
     this.component = new ResourceComponent(type, amount);
     
+    // Adjust position so mesh bottom rests on terrain (not center)
+    // Position.y is terrain height, but mesh center is at position
+    // Need to offset by half the mesh size
+    const size = type === 'crystal' || type === 'essence' || type === 'mana' 
+      ? GameScale.RESOURCE_NODE_SMALL 
+      : GameScale.RESOURCE_NODE_SIZE;
+    const adjustedPosition = position.clone();
+    adjustedPosition.y += size / 2; // Move up by half size so bottom is at terrain
+    
     // Create visual representation
-    this.mesh = this.primitiveFactory.createResourceNode(type, position);
+    this.mesh = this.primitiveFactory.createResourceNode(type, adjustedPosition);
     this.mesh.metadata = { resource: this };
   }
 

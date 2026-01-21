@@ -13,7 +13,7 @@ import { WaveSystem } from '../systems/WaveSystem';
 import { BuildingSystem } from '../systems/BuildingSystem';
 import { ResourceSystem } from '../systems/ResourceSystem';
 import { ServantSystem } from '../systems/ServantSystem';
-import { ArcRotateCamera } from '@babylonjs/core';
+import { FreeCamera } from '@babylonjs/core';
 import { Tower } from '../entities/Tower';
 import { Vector3 } from '@babylonjs/core';
 
@@ -32,7 +32,7 @@ export class GameUI {
     buildingSystem: BuildingSystem,
     resourceSystem?: ResourceSystem,
     servantSystem?: ServantSystem,
-    camera?: ArcRotateCamera
+    camera?: FreeCamera
   ) {
     // Create UI containers if they don't exist
     this.createUIContainers();

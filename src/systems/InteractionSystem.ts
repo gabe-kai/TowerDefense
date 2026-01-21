@@ -12,6 +12,7 @@ import { BuildingSystem } from './BuildingSystem';
 import { InfoPanel, ObjectInfo, ActionButton } from '../ui/InfoPanel';
 import { WorkQueue } from './WorkQueue';
 import { createCategoryLogger } from '../utils/Logger';
+import { SelectableObject } from './SelectableObject';
 
 export class InteractionSystem {
   private scene: Scene;
@@ -230,7 +231,15 @@ export class InteractionSystem {
       };
     }
 
-    // Check for tower
+    // Check for tower (via selectable metadata)
+    if (mesh.metadata.selectable) {
+      const selectable = mesh.metadata.selectable as SelectableObject;
+      if (typeof selectable.isSelectable === 'function' && typeof selectable.getName === 'function' && typeof selectable.getObjectInfo === 'function') {
+        return selectable;
+      }
+    }
+
+    // Check for tower (legacy support)
     if (mesh.metadata.tower) {
       const tower = mesh.metadata.tower as Tower;
       return {
@@ -238,6 +247,14 @@ export class InteractionSystem {
         getObjectInfo: () => this.getTowerInfo(tower),
         isSelectable: () => true
       };
+    }
+
+    // Check for house
+    if (mesh.metadata.house) {
+      const house = mesh.metadata.house as SelectableObject;
+      if (typeof house.isSelectable === 'function' && typeof house.getName === 'function' && typeof house.getObjectInfo === 'function') {
+        return house;
+      }
     }
 
     // Check for servant
