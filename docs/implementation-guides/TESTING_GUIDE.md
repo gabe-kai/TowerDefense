@@ -101,6 +101,26 @@ UI components that use HTML5 Canvas (like `Minimap` and `Compass`) require speci
 
 Example tests: See `src/ui/__tests__/Minimap.test.ts` and `src/ui/__tests__/Compass.test.ts`
 
+## Building Placement System Testing
+
+Comprehensive test suite for Phase 2 Building Placement System:
+
+**Test Files**:
+- `src/systems/__tests__/BuildingPlacementSystem.test.ts` - Placement preview and validation
+- `src/systems/__tests__/BuildingSystem.test.ts` - Building construction logic
+- `src/systems/__tests__/ConsoleSystem.test.ts` - Developer console commands
+- `src/utils/__tests__/BuildingValidator.test.ts` - Placement validation logic
+- `src/ui/__tests__/ConsoleUI.test.ts` - Console UI component
+
+**Test Plan**: See `BUILDING_PLACEMENT_TEST_PLAN.md` for comprehensive test coverage details.
+
+**Coverage**: ~175+ test cases covering:
+- All building types
+- Placement validation (distance, terrain, resources)
+- Error handling and feedback
+- Console commands and UI
+- Edge cases and integration scenarios
+
 ## Best Practices
 
 1. **Test one thing at a time** - Each test should verify a single behavior

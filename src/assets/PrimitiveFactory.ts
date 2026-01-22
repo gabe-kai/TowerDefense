@@ -742,7 +742,7 @@ export class PrimitiveFactory {
     }
   }
 
-  createGroundStructure(buildingType: string, position: Vector3): Mesh {
+  createGroundStructure(buildingType: string, position: Vector3, useStilts: boolean = false): Mesh {
     if (!this.scene) {
       throw new Error('PrimitiveFactory not initialized with scene');
     }
@@ -755,12 +755,14 @@ export class PrimitiveFactory {
         // Turret: Cylindrical base with smaller cylinder on top
         const turretBase = Mesh.CreateCylinder(`${buildingType}_base`, GameScale.TURRET_SIZE * 0.6, GameScale.TURRET_SIZE, GameScale.TURRET_SIZE, 16, 1, this.scene);
         turretBase.position = position.clone();
-        turretBase.position.y = GameScale.TURRET_SIZE * 0.3;
+        // Add offset to terrain height (position.y already has terrain height)
+        turretBase.position.y += GameScale.TURRET_SIZE * 0.3;
         turretBase.isPickable = true;
         
         const turretTop = Mesh.CreateCylinder(`${buildingType}_top`, GameScale.TURRET_SIZE * 0.4, GameScale.TURRET_SIZE * 0.7, GameScale.TURRET_SIZE * 0.7, 16, 1, this.scene);
         turretTop.position = position.clone();
-        turretTop.position.y = GameScale.TURRET_SIZE * 0.8;
+        // Add offset to terrain height
+        turretTop.position.y += GameScale.TURRET_SIZE * 0.8;
         turretTop.parent = turretBase;
         turretTop.isPickable = false; // Only base is pickable
         
@@ -780,7 +782,8 @@ export class PrimitiveFactory {
         mesh = Mesh.CreateBox(`${buildingType}_${Date.now()}`, wallHeight, this.scene);
         mesh.scaling = new Vector3(wallLength / wallHeight, 1, wallThickness / wallHeight);
         mesh.position = position.clone();
-        mesh.position.y = wallHeight / 2;
+        // Add offset to terrain height (position.y already has terrain height)
+        mesh.position.y += wallHeight / 2;
         mesh.isPickable = true;
         materialId = 'stone';
         break;
@@ -789,12 +792,14 @@ export class PrimitiveFactory {
         // Cannon: Box base with cylinder barrel
         const cannonBase = Mesh.CreateBox(`${buildingType}_base`, GameScale.TURRET_SIZE * 0.8, this.scene);
         cannonBase.position = position.clone();
-        cannonBase.position.y = GameScale.TURRET_SIZE * 0.4;
+        // Add offset to terrain height
+        cannonBase.position.y += GameScale.TURRET_SIZE * 0.4;
         cannonBase.isPickable = true;
         
         const cannonBarrel = Mesh.CreateCylinder(`${buildingType}_barrel`, GameScale.TURRET_SIZE * 0.6, GameScale.TURRET_SIZE * 0.3, GameScale.TURRET_SIZE * 0.3, 16, 1, this.scene);
         cannonBarrel.position = position.clone();
-        cannonBarrel.position.y = GameScale.TURRET_SIZE * 0.9;
+        // Add offset to terrain height
+        cannonBarrel.position.y += GameScale.TURRET_SIZE * 0.9;
         cannonBarrel.rotation.z = Math.PI / 2; // Rotate barrel to point forward
         cannonBarrel.parent = cannonBase;
         cannonBarrel.isPickable = false;
@@ -815,7 +820,8 @@ export class PrimitiveFactory {
         mesh = Mesh.CreateBox(`${buildingType}_${Date.now()}`, barrierHeight, this.scene);
         mesh.scaling = new Vector3(barrierLength / barrierHeight, 1, barrierThickness / barrierHeight);
         mesh.position = position.clone();
-        mesh.position.y = barrierHeight / 2;
+        // Add offset to terrain height
+        mesh.position.y += barrierHeight / 2;
         mesh.isPickable = true;
         materialId = 'wood';
         break;
@@ -825,7 +831,8 @@ export class PrimitiveFactory {
         const storageSize = 2.0;
         mesh = Mesh.CreateBox(`${buildingType}_${Date.now()}`, storageSize, this.scene);
         mesh.position = position.clone();
-        mesh.position.y = storageSize / 2;
+        // Add offset to terrain height (position.y already has terrain height)
+        mesh.position.y += storageSize / 2;
         mesh.isPickable = true;
         materialId = 'wood';
         break;
@@ -835,13 +842,15 @@ export class PrimitiveFactory {
         const workshopSize = 2.5;
         const workshopBase = Mesh.CreateBox(`${buildingType}_base`, workshopSize * 0.8, this.scene);
         workshopBase.position = position.clone();
-        workshopBase.position.y = workshopSize * 0.4;
+        // Add offset to terrain height
+        workshopBase.position.y += workshopSize * 0.4;
         workshopBase.isPickable = true;
         
         const workshopRoof = Mesh.CreateBox(`${buildingType}_roof`, workshopSize * 0.3, this.scene);
         workshopRoof.scaling = new Vector3(1, 1, 1);
         workshopRoof.position = position.clone();
-        workshopRoof.position.y = workshopSize * 0.9;
+        // Add offset to terrain height
+        workshopRoof.position.y += workshopSize * 0.9;
         workshopRoof.rotation.x = Math.PI / 6; // Slight tilt for roof effect
         workshopRoof.parent = workshopBase;
         workshopRoof.isPickable = false;
@@ -862,7 +871,8 @@ export class PrimitiveFactory {
         const barracksSize = 3.0;
         mesh = Mesh.CreateBox(`${buildingType}_${Date.now()}`, barracksSize, this.scene);
         mesh.position = position.clone();
-        mesh.position.y = barracksSize / 2;
+        // Add offset to terrain height (position.y already has terrain height)
+        mesh.position.y += barracksSize / 2;
         mesh.isPickable = true;
         materialId = 'wood';
         break;
@@ -872,7 +882,8 @@ export class PrimitiveFactory {
         const librarySize = 2.5;
         mesh = Mesh.CreateBox(`${buildingType}_${Date.now()}`, librarySize, this.scene);
         mesh.position = position.clone();
-        mesh.position.y = librarySize / 2;
+        // Add offset to terrain height
+        mesh.position.y += librarySize / 2;
         mesh.isPickable = true;
         materialId = 'wood';
         break;
@@ -883,7 +894,8 @@ export class PrimitiveFactory {
         const spellTowerRadius = 1.0;
         mesh = Mesh.CreateCylinder(`${buildingType}_${Date.now()}`, spellTowerHeight, spellTowerRadius, spellTowerRadius, 16, 1, this.scene);
         mesh.position = position.clone();
-        mesh.position.y = spellTowerHeight / 2;
+        // Add offset to terrain height (position.y already has terrain height)
+        mesh.position.y += spellTowerHeight / 2;
         mesh.isPickable = true;
         materialId = 'crystal'; // Magical material
         break;
@@ -892,7 +904,8 @@ export class PrimitiveFactory {
         // Default: Simple box
         mesh = Mesh.CreateBox(`${buildingType}_${Date.now()}`, 1.5, this.scene);
         mesh.position = position.clone();
-        mesh.position.y = 0.75;
+        // Add offset to terrain height
+        mesh.position.y += 0.75;
         mesh.isPickable = true;
         materialId = 'wood';
     }
@@ -901,6 +914,11 @@ export class PrimitiveFactory {
     if (!mesh.material) {
       const material = this.materialLibrary.getBabylonMaterial(materialId, this.scene);
       mesh.material = material;
+    }
+
+    // Add stilts/foundations if requested (for uneven terrain)
+    if (useStilts) {
+      this.addStilts(mesh, position);
     }
 
     // Register in catalog
@@ -914,6 +932,56 @@ export class PrimitiveFactory {
     );
 
     return mesh;
+  }
+
+  /**
+   * Add stilts/foundations to a building mesh for uneven terrain
+   */
+  private addStilts(buildingMesh: Mesh, position: Vector3): void {
+    if (!this.scene) return;
+    const scene = this.scene;
+
+    // Create 4 stilts at the corners of the building
+    // Get building bounding box to determine corner positions
+    const boundingInfo = buildingMesh.getBoundingInfo();
+    const extendSize = boundingInfo.boundingBox.extendSize;
+    
+    // Calculate corner positions (approximate - use building size)
+    const stiltPositions = [
+      new Vector3(-extendSize.x, 0, -extendSize.z), // Front-left
+      new Vector3(extendSize.x, 0, -extendSize.z),  // Front-right
+      new Vector3(-extendSize.x, 0, extendSize.z),  // Back-left
+      new Vector3(extendSize.x, 0, extendSize.z)     // Back-right
+    ];
+
+    // Create stilts (thin cylinders)
+    const stiltHeight = 1.5; // 1.5m tall stilts
+    const stiltRadius = 0.15; // 15cm radius (thin support posts)
+    
+    stiltPositions.forEach((stiltOffset, index) => {
+      const stilt = Mesh.CreateCylinder(
+        `${buildingMesh.name}_stilt_${index}`,
+        stiltHeight,
+        stiltRadius,
+        stiltRadius,
+        8,
+        1,
+        scene
+      );
+      
+      // Position stilt at corner, extending down from building base
+      stilt.position = position.clone();
+      stilt.position.addInPlace(stiltOffset);
+      stilt.position.y -= stiltHeight / 2; // Bottom of stilt at terrain level
+      
+      // Parent to building mesh so it moves with the building
+      stilt.parent = buildingMesh;
+      stilt.isPickable = false; // Stilts aren't pickable
+      
+      // Use stone material for stilts
+      const stiltMaterial = this.materialLibrary.getBabylonMaterial('stone', scene);
+      stilt.material = stiltMaterial;
+    });
   }
 
   /**

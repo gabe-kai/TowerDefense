@@ -9,6 +9,7 @@ import { Servant } from '../entities/Servant';
 import { ServantSystem } from './ServantSystem';
 import { ResourceSystem } from './ResourceSystem';
 import { BuildingSystem } from './BuildingSystem';
+import { BuildingPlacementSystem } from './BuildingPlacementSystem';
 import { InfoPanel, ObjectInfo, ActionButton } from '../ui/InfoPanel';
 import { WorkQueue } from './WorkQueue';
 import { createCategoryLogger } from '../utils/Logger';
@@ -35,12 +36,14 @@ export class InteractionSystem {
     scene: Scene,
     servantSystem: ServantSystem,
     resourceSystem: ResourceSystem,
-    buildingSystem?: BuildingSystem
+    buildingSystem?: BuildingSystem,
+    placementSystem?: BuildingPlacementSystem
   ) {
     this.scene = scene;
     this.servantSystem = servantSystem;
     this.resourceSystem = resourceSystem;
     this.buildingSystem = buildingSystem || null;
+    this.placementSystem = placementSystem || null;
     this.infoPanel = new InfoPanel();
     this.workQueue = WorkQueue.getInstance();
     
@@ -92,6 +95,39 @@ export class InteractionSystem {
   }
 
   /**
+   * Find the selectable mesh by traversing up the parent chain
+   * This handles cases where child meshes are clicked but metadata is on parent
+   */
+  private findSelectableMesh(mesh: Mesh | null): Mesh | null {
+    if (!mesh || !this.isMesh(mesh)) {
+      return null;
+    }
+
+    let currentMesh: Mesh | null = mesh;
+    
+    // Traverse up the parent chain to find a mesh with selectable metadata
+    while (currentMesh) {
+      if (currentMesh.metadata) {
+        // Check if this mesh has selectable metadata
+        if (currentMesh.metadata.selectable || 
+            currentMesh.metadata.tower || 
+            currentMesh.metadata.house || 
+            currentMesh.metadata.resource || 
+            currentMesh.metadata.servant || 
+            currentMesh.metadata.building) {
+          return currentMesh;
+        }
+      }
+      
+      // Move up to parent
+      currentMesh = currentMesh.parent as Mesh | null;
+    }
+    
+    // If no parent with metadata found, return original mesh
+    return mesh;
+  }
+
+  /**
    * Handle pointer move (hover detection)
    */
   private handlePointerMove(pickInfo: PickingInfo): void {
@@ -107,14 +143,21 @@ export class InteractionSystem {
       return;
     }
 
+    // Find the selectable mesh (may be parent)
+    const selectableMesh = this.findSelectableMesh(hitMesh);
+    if (!selectableMesh) {
+      this.clearHover();
+      return;
+    }
+
     // Check if hovering over a selectable object
-    const selectable = this.getSelectableObject(hitMesh);
+    const selectable = this.getSelectableObject(selectableMesh);
     
     if (selectable && selectable.isSelectable()) {
       // Only highlight if not already hovering this object
-      if (!this.hoveredObject || this.hoveredObject.mesh !== hitMesh) {
+      if (!this.hoveredObject || this.hoveredObject.mesh !== selectableMesh) {
         this.clearHover();
-        this.setHover(hitMesh);
+        this.setHover(selectableMesh);
       }
     } else {
       // Not hovering over a selectable object
@@ -126,6 +169,22 @@ export class InteractionSystem {
    * Handle pointer click
    */
   private handlePointerClick(pickInfo: PickingInfo): void {
+    // If in placement mode and clicking on an object (not terrain), cancel placement
+    if (this.placementSystem && this.placementSystem.isInPlacementMode()) {
+      // Check if we clicked on a mesh (not terrain)
+      if (pickInfo.hit && pickInfo.pickedMesh && this.isMesh(pickInfo.pickedMesh)) {
+        const hitMesh = pickInfo.pickedMesh;
+        // If it's not the preview mesh, cancel placement
+        if (!hitMesh.metadata || !hitMesh.metadata.isPreview) {
+          this.placementSystem.cancelPlacement();
+          // Continue with normal click handling
+        } else {
+          // Clicked on preview mesh - let placement system handle it
+          return;
+        }
+      }
+    }
+
     // If clicking on empty space or non-mesh, clear selection
     if (!pickInfo.hit || !pickInfo.pickedMesh || !this.isMesh(pickInfo.pickedMesh)) {
       this.clearSelected();
@@ -134,23 +193,32 @@ export class InteractionSystem {
     }
 
     const hitMesh = pickInfo.pickedMesh;
-    const selectable = this.getSelectableObject(hitMesh);
+    
+    // Find the selectable mesh (may be parent)
+    const selectableMesh = this.findSelectableMesh(hitMesh);
+    if (!selectableMesh) {
+      this.clearSelected();
+      this.infoPanel.hide();
+      return;
+    }
+    
+    const selectable = this.getSelectableObject(selectableMesh);
     
     if (selectable && selectable.isSelectable()) {
       // Clear previous selection first (if different object)
-      if (this.selectedObject && this.selectedObject.mesh !== hitMesh) {
+      if (this.selectedObject && this.selectedObject.mesh !== selectableMesh) {
         this.clearSelected();
       }
       
       // Set selected object
-      this.setSelected(hitMesh);
+      this.setSelected(selectableMesh);
       
       // Show info panel
       const objectInfo = selectable.getObjectInfo();
       
       // Add "Add to Work Queue" button for resources
-      if (hitMesh.metadata && hitMesh.metadata.resource) {
-        const resource = hitMesh.metadata.resource as Resource;
+      if (selectableMesh.metadata && selectableMesh.metadata.resource) {
+        const resource = selectableMesh.metadata.resource as Resource;
         if (!resource.isCollected()) {
           objectInfo.actions = [{
             label: 'Add to Work Queue',

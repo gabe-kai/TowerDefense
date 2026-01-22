@@ -365,17 +365,38 @@ export class SceneManager {
    * Setup keyboard controls for camera movement
    */
   private setupKeyboardControls(): void {
+    // Helper to check if user is typing in an input field
+    const isInputFocused = (): boolean => {
+      const activeElement = document.activeElement;
+      return activeElement instanceof HTMLInputElement || 
+             activeElement instanceof HTMLTextAreaElement ||
+             activeElement?.tagName === 'INPUT' ||
+             activeElement?.tagName === 'TEXTAREA';
+    };
+
     // Track key presses
     window.addEventListener('keydown', (event) => {
+      // Don't capture keys when user is typing in an input field
+      if (isInputFocused()) {
+        return;
+      }
       this.keysPressed.add(event.key.toLowerCase());
     });
 
     window.addEventListener('keyup', (event) => {
+      // Don't capture keys when user is typing in an input field
+      if (isInputFocused()) {
+        return;
+      }
       this.keysPressed.delete(event.key.toLowerCase());
     });
 
     // Prevent default browser behavior for camera control keys
     window.addEventListener('keydown', (event) => {
+      // Don't prevent default when user is typing in an input field
+      if (isInputFocused()) {
+        return;
+      }
       const key = event.key.toLowerCase();
       if (['w', 'a', 's', 'd', 'r', 'f', 'q', 'e'].includes(key)) {
         event.preventDefault();
@@ -618,6 +639,68 @@ export class SceneManager {
 
   getCamera(): FreeCamera {
     return this.camera;
+  }
+
+  /**
+   * Set camera position and rotation to look from behind player house toward AI tower
+   * @param playerTowerPos Position of player tower
+   * @param aiTowerPos Position of AI tower
+   */
+  setInitialCameraPosition(playerTowerPos: Vector3, aiTowerPos: Vector3): void {
+    // Calculate direction from player tower to AI tower
+    const directionToAI = aiTowerPos.subtract(playerTowerPos);
+    const distance = directionToAI.length();
+    const directionNormalized = directionToAI.normalize();
+
+    // House extends forward from tower (toward map center/AI tower)
+    // "Behind" the house means opposite direction (away from AI tower)
+    const houseWidth = GameScale.COTTAGE_HOUSE_WIDTH; // 5.0m (front to back)
+    const houseHeight = GameScale.COTTAGE_HOUSE_HEIGHT; // 3.0m
+    const towerBaseHeight = 7.0; // 2 stories (6m) + roof (1m)
+    const totalHeight = towerBaseHeight + houseHeight; // Total height of tower + house
+
+    // Position camera behind the house (on player's side, away from AI tower)
+    // Offset back by house width + some extra space + 30m additional distance
+    const backOffset = houseWidth + 3.0 + 30.0; // 5m (house) + 3m (extra space) + 30m (farther back)
+    const cameraPosition = playerTowerPos.subtract(directionNormalized.scale(backOffset));
+    
+    // Elevate camera above the house and a little back (above the line)
+    // Add tower height + house height + extra elevation
+    const elevation = totalHeight + 5.0; // Above house + 5m extra
+    cameraPosition.y += elevation;
+
+    // Set camera position
+    this.camera.position = cameraPosition;
+
+    // Calculate rotation to look through/above player tower toward AI tower
+    // Create a target point slightly above the AI tower
+    const targetPoint = aiTowerPos.clone();
+    targetPoint.y += towerBaseHeight / 2; // Look at middle of AI tower
+
+    // Calculate direction from camera to target
+    const lookDirection = targetPoint.subtract(cameraPosition).normalize();
+
+    // Calculate yaw (rotation around Y axis) - horizontal angle
+    const yaw = Math.atan2(lookDirection.x, lookDirection.z);
+
+    // Calculate pitch (rotation around X axis) - vertical angle
+    const horizontalDistance = Math.sqrt(lookDirection.x * lookDirection.x + lookDirection.z * lookDirection.z);
+    const pitch = Math.atan2(-lookDirection.y, horizontalDistance);
+
+    // Rotate camera down 5 degrees (so AI tower is higher on screen, player tower more visible)
+    const additionalPitch = 5 * (Math.PI / 180); // 5 degrees in radians
+    const finalPitch = pitch + additionalPitch;
+
+    // Set camera rotation (pitch, yaw, roll)
+    this.camera.rotation = new Vector3(finalPitch, yaw, 0);
+
+    this.logger.info('Camera positioned for initial view', {
+      cameraPosition: cameraPosition,
+      targetPoint: targetPoint,
+      yaw: yaw * (180 / Math.PI),
+      pitch: finalPitch * (180 / Math.PI),
+      pitchAdjustment: '5° down'
+    });
   }
 
   getEngine(): Engine {

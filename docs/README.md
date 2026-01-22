@@ -31,6 +31,7 @@ Project status updates, integration summaries, and milestone reports.
 - `MINIMAP_AND_COMPASS_COMPLETE.md` - Minimap and Compass implementation completion report
 - `CAMERA_CONTROLS_COMPLETE.md` - Camera controls system implementation completion report
 - `TERRAIN_SYSTEM_COMPLETE.md` - Terrain system implementation completion report
+- `PHASE2_BUILDING_PLACEMENT_COMPLETE.md` - Phase 2 Building Placement System completion report
 
 ### `/screenshots`
 Game screenshots documenting milestones and features.

@@ -480,6 +480,130 @@ html, body {
   font-size: 20px;
 }
 
+/* Console */
+.console {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(10, 8, 15, 0.98);
+  border-top: 3px solid #8b6f47;
+  color: #f4e4bc;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.7);
+  z-index: 400;
+  display: none;
+  font-family: 'Courier New', monospace;
+  max-height: 50vh;
+  flex-direction: column;
+}
+
+.console-output {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px;
+  font-size: 13px;
+  line-height: 1.6;
+  max-height: calc(50vh - 60px);
+}
+
+.console-line {
+  margin-bottom: 4px;
+  word-wrap: break-word;
+}
+
+.console-line-command {
+  color: #ffd700;
+  font-weight: bold;
+}
+
+.console-line-output {
+  color: #a0d0ff;
+}
+
+.console-line-error {
+  color: #ff6b6b;
+}
+
+.console-line-system {
+  color: #8b9dc3;
+  font-style: italic;
+}
+
+.console-input {
+  width: 100%;
+  padding: 12px 15px;
+  background: rgba(20, 15, 30, 0.95);
+  border: 2px solid #8b6f47;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  color: #f4e4bc;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  outline: none;
+}
+
+.console-input:focus {
+  border-color: #ffd700;
+  background: rgba(30, 25, 40, 0.95);
+}
+
+.console-input::placeholder {
+  color: #8b9dc3;
+  opacity: 0.7;
+}
+
+/* Placement Tooltip */
+.placement-tooltip {
+  position: fixed;
+  background: rgba(20, 15, 30, 0.95);
+  border: 2px solid #ff6b6b;
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #ff6b6b;
+  font-size: 13px;
+  font-family: 'Courier New', monospace;
+  pointer-events: none;
+  z-index: 500;
+  white-space: nowrap;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  transform: translateY(-100%);
+}
+
+/* Placement Error Notification */
+.placement-error-notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(20, 15, 30, 0.98);
+  border: 3px solid #ff6b6b;
+  border-radius: 8px;
+  padding: 20px 30px;
+  color: #ff6b6b;
+  font-size: 16px;
+  font-weight: bold;
+  z-index: 600;
+  box-shadow: 0 8px 16px rgba(255, 107, 107, 0.4);
+  text-align: center;
+  max-width: 500px;
+  animation: errorPulse 0.5s ease-in-out;
+}
+
+@keyframes errorPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
 .work-queue-close {
   background: transparent;
   border: 2px solid #8b6f47;

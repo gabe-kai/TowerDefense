@@ -143,17 +143,28 @@ class MockColor3 {
       dispose: vi.fn()
     }))
   },
-  StandardMaterial: vi.fn().mockImplementation((name: string, scene: any) => ({
-    name,
-    diffuseColor: new MockColor3(1, 1, 1),
-    emissiveColor: new MockColor3(0, 0, 0),
-    roughness: 0.5,
-    metallic: 0.0,
-    alpha: 1.0,
-    animations: [],
-    dispose: vi.fn(),
-    _scene: scene || { getUniqueId: vi.fn(() => 1) }
-  })),
+  StandardMaterial: vi.fn().mockImplementation((name: string, scene: any) => {
+    const mockEngine = {
+      getRenderWidth: vi.fn(() => 1920),
+      getRenderHeight: vi.fn(() => 1080),
+      createMaterialContext: vi.fn(() => ({}))
+    };
+    const mockSceneWithEngine = scene || { 
+      getUniqueId: vi.fn(() => 1),
+      getEngine: vi.fn(() => mockEngine)
+    };
+    return {
+      name,
+      diffuseColor: new MockColor3(1, 1, 1),
+      emissiveColor: new MockColor3(0, 0, 0),
+      roughness: 0.5,
+      metallic: 0.0,
+      alpha: 1.0,
+      animations: [],
+      dispose: vi.fn(),
+      _scene: mockSceneWithEngine
+    };
+  }),
   Animation: vi.fn().mockImplementation(() => ({
     setKeys: vi.fn()
   })),

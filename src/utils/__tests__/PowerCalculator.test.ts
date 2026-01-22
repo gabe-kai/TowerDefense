@@ -18,7 +18,13 @@ vi.mock('../../assets/PrimitiveFactory', () => ({
       initialize: vi.fn(),
       createTowerBase: vi.fn((name, position) => ({
         name,
-        position: position || new Vector3(0, 0, 0),
+        position: position || new (global as any).Babylon.Vector3(0, 0, 0),
+        metadata: {},
+        dispose: vi.fn()
+      })),
+      createHouse: vi.fn((name, position) => ({
+        name,
+        position: position || new (global as any).Babylon.Vector3(0, 0, 0),
         metadata: {},
         dispose: vi.fn()
       }))

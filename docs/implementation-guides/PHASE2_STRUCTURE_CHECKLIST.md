@@ -11,6 +11,13 @@ This document outlines all structures that need to be designed, implemented, and
   - House rotates around back wall center
   - Proper overhang and normals
 
+- **Ground Structures** - Complete
+  - All ground structures have visual 3D meshes
+  - Terrain-aware positioning (snap to terrain height)
+  - Visual placement preview system
+  - Validation and error feedback
+  - Stilts option for uneven terrain
+
 ---
 
 ## Structures to Design and Test
@@ -65,13 +72,13 @@ This document outlines all structures that need to be designed, implemented, and
 - Color: Gray/brown (stone), darker accents for metal parts
 
 **Testing Checklist**:
-- [ ] Turret mesh created correctly
-- [ ] Turret placed at correct ground level
-- [ ] Turret is visible when placed
-- [ ] Turret can be selected (raycasting)
-- [ ] Turret shows in info panel with correct stats
-- [ ] Turret appears in minimap
-- [ ] Multiple turrets can be placed without overlap
+- [x] Turret mesh created correctly ✅
+- [x] Turret placed at correct ground level ✅
+- [x] Turret is visible when placed ✅
+- [x] Turret can be selected (raycasting) ✅
+- [x] Turret shows in info panel with correct stats ✅
+- [x] Turret appears in minimap ✅
+- [x] Multiple turrets can be placed without overlap ✅
 
 #### 3. **Cannon** (Offense Structure)
 **Purpose**: Heavy artillery for long-range attacks  
@@ -89,13 +96,13 @@ This document outlines all structures that need to be designed, implemented, and
 - Color: Dark metallic cannon, brown wooden base
 
 **Testing Checklist**:
-- [ ] Cannon mesh created correctly
-- [ ] Cannon placed at correct ground level
-- [ ] Cannon is visible when placed
-- [ ] Cannon can be selected (raycasting)
-- [ ] Cannon shows in info panel with correct stats
-- [ ] Cannon appears in minimap
-- [ ] Cannon size is distinguishable from turret
+- [x] Cannon mesh created correctly ✅
+- [x] Cannon placed at correct ground level ✅
+- [x] Cannon is visible when placed ✅
+- [x] Cannon can be selected (raycasting) ✅
+- [x] Cannon shows in info panel with correct stats ✅
+- [x] Cannon appears in minimap ✅
+- [x] Cannon size is distinguishable from turret ✅
 
 #### 4. **Wall** (Defense Structure)
 **Purpose**: Barrier to block enemy movement  
@@ -167,12 +174,12 @@ This document outlines all structures that need to be designed, implemented, and
 - Special: May have visible storage containers inside/around it
 
 **Testing Checklist**:
-- [ ] Storage mesh created correctly
-- [ ] Storage placed at correct ground level
-- [ ] Storage is visible when placed
-- [ ] Storage can be selected (raycasting)
-- [ ] Storage shows in info panel with correct stats
-- [ ] Storage appears in minimap
+- [x] Storage mesh created correctly ✅
+- [x] Storage placed at correct ground level ✅ (Fixed positioning bug)
+- [x] Storage is visible when placed ✅
+- [x] Storage can be selected (raycasting) ✅
+- [x] Storage shows in info panel with correct stats ✅
+- [x] Storage appears in minimap ✅
 
 #### 7. **Workshop** (Resource Structure)
 **Purpose**: Production/resource generation building  
@@ -191,12 +198,12 @@ This document outlines all structures that need to be designed, implemented, and
 - Special: May have smoke/fire effects (for future particle system)
 
 **Testing Checklist**:
-- [ ] Workshop mesh created correctly
-- [ ] Workshop placed at correct ground level
-- [ ] Workshop is visible when placed
-- [ ] Workshop can be selected (raycasting)
-- [ ] Workshop shows in info panel with correct stats
-- [ ] Workshop appears in minimap
+- [x] Workshop mesh created correctly ✅
+- [x] Workshop placed at correct ground level ✅
+- [x] Workshop is visible when placed ✅
+- [x] Workshop can be selected (raycasting) ✅
+- [x] Workshop shows in info panel with correct stats ✅
+- [x] Workshop appears in minimap ✅
 
 ---
 
@@ -219,12 +226,12 @@ This document outlines all structures that need to be designed, implemented, and
 - Special: May have multiple windows/doors to suggest multiple rooms
 
 **Testing Checklist**:
-- [ ] Barracks mesh created correctly
-- [ ] Barracks placed at correct ground level
-- [ ] Barracks is visible when placed
-- [ ] Barracks can be selected (raycasting)
-- [ ] Barracks shows in info panel with correct stats
-- [ ] Barracks appears in minimap
+- [x] Barracks mesh created correctly ✅
+- [x] Barracks placed at correct ground level ✅ (Fixed positioning bug)
+- [x] Barracks is visible when placed ✅
+- [x] Barracks can be selected (raycasting) ✅
+- [x] Barracks shows in info panel with correct stats ✅
+- [x] Barracks appears in minimap ✅
 
 ---
 
@@ -247,13 +254,13 @@ This document outlines all structures that need to be designed, implemented, and
 - Special: Emissive materials for magical glow (for future)
 
 **Testing Checklist**:
-- [ ] Library mesh created correctly
-- [ ] Library placed at correct ground level
-- [ ] Library is visible when placed
-- [ ] Library can be selected (raycasting)
-- [ ] Library shows in info panel with correct stats
-- [ ] Library appears in minimap
-- [ ] Library has magical visual elements (emissive glow)
+- [x] Library mesh created correctly ✅
+- [x] Library placed at correct ground level ✅
+- [x] Library is visible when placed ✅
+- [x] Library can be selected (raycasting) ✅
+- [x] Library shows in info panel with correct stats ✅
+- [x] Library appears in minimap ✅
+- [ ] Library has magical visual elements (emissive glow) (Future enhancement)
 
 #### 10. **Spell Tower** (Offense Structure)
 **Purpose**: Magical offensive structure  
@@ -272,13 +279,13 @@ This document outlines all structures that need to be designed, implemented, and
 - Special: Crystal/orb at top that can glow/pulse
 
 **Testing Checklist**:
-- [ ] Spell Tower mesh created correctly
-- [ ] Spell Tower placed at correct ground level
-- [ ] Spell Tower is visible when placed
-- [ ] Spell Tower can be selected (raycasting)
-- [ ] Spell Tower shows in info panel with correct stats
-- [ ] Spell Tower appears in minimap
-- [ ] Spell Tower has magical visual elements (glowing crystal)
+- [x] Spell Tower mesh created correctly ✅
+- [x] Spell Tower placed at correct ground level ✅ (Fixed positioning bug)
+- [x] Spell Tower is visible when placed ✅
+- [x] Spell Tower can be selected (raycasting) ✅
+- [x] Spell Tower shows in info panel with correct stats ✅
+- [x] Spell Tower appears in minimap ✅
+- [x] Spell Tower has magical visual elements (glowing crystal) ✅ (Crystal material)
 
 ---
 

@@ -11,6 +11,7 @@ import { Minimap } from './Minimap';
 import { Compass } from './Compass';
 import { WaveSystem } from '../systems/WaveSystem';
 import { BuildingSystem } from '../systems/BuildingSystem';
+import { BuildingPlacementSystem } from '../systems/BuildingPlacementSystem';
 import { ResourceSystem } from '../systems/ResourceSystem';
 import { ServantSystem } from '../systems/ServantSystem';
 import { FreeCamera } from '@babylonjs/core';
@@ -32,7 +33,8 @@ export class GameUI {
     buildingSystem: BuildingSystem,
     resourceSystem?: ResourceSystem,
     servantSystem?: ServantSystem,
-    camera?: FreeCamera
+    camera?: FreeCamera,
+    buildingPlacementSystem?: BuildingPlacementSystem
   ) {
     // Create UI containers if they don't exist
     this.createUIContainers();
@@ -41,7 +43,7 @@ export class GameUI {
     this.resourceDisplay = new ResourceDisplay('resource-display');
     this.waveTimer = new WaveTimer('wave-timer', waveSystem);
     this.powerLevelDisplay = new PowerLevelDisplay('power-level-display');
-    this.buildingMenu = new BuildingMenu('building-menu', buildingSystem);
+    this.buildingMenu = new BuildingMenu('building-menu', buildingSystem, buildingPlacementSystem);
     this.workQueuePanel = new WorkQueuePanel('work-queue-panel');
     this.minimap = new Minimap('minimap');
     this.compass = new Compass('compass');

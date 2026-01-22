@@ -11,7 +11,10 @@ import { EnemySystem } from '../systems/EnemySystem';
 import { WaveSystem } from '../systems/WaveSystem';
 import { AISystem } from '../systems/AISystem';
 import { InteractionSystem } from '../systems/InteractionSystem';
+import { ConsoleSystem } from '../systems/ConsoleSystem';
+import { BuildingPlacementSystem } from '../systems/BuildingPlacementSystem';
 import { GameUI } from '../ui/GameUI';
+import { ConsoleUI } from '../ui/ConsoleUI';
 import { PowerCalculator } from '../utils/PowerCalculator';
 import { Vector3 } from '@babylonjs/core';
 import { createCategoryLogger } from '../utils/Logger';
@@ -32,7 +35,9 @@ export class Game {
   private waveSystem: WaveSystem | null = null;
   private aiSystem: AISystem | null = null;
   private interactionSystem: InteractionSystem | null = null;
+  private buildingPlacementSystem: BuildingPlacementSystem | null = null;
   private gameUI: GameUI | null = null;
+  private consoleSystem: ConsoleSystem | null = null;
   private powerCalculator: PowerCalculator;
   private logger = createCategoryLogger('Game');
   private seededRandom: SeededRandom;
@@ -92,12 +97,20 @@ export class Game {
       this.buildingSystem
     );
     
+    // Initialize building placement system
+    this.buildingPlacementSystem = new BuildingPlacementSystem(
+      scene,
+      this.buildingSystem,
+      terrainManager || undefined
+    );
+
     // Initialize interaction system (handles clicks, hover)
     this.interactionSystem = new InteractionSystem(
       scene,
       this.servantSystem,
       this.resourceSystem,
-      this.buildingSystem
+      this.buildingSystem,
+      this.buildingPlacementSystem
     );
 
     // Create towers positioned 2km apart on opposite sides of the valley
@@ -160,6 +173,9 @@ export class Game {
     const playerTower = this.buildingSystem.createPlayerTower(playerTowerPos);
     const aiTower = this.buildingSystem.createAITower(aiTowerPos);
 
+    // Set initial camera position (behind player house, looking toward AI tower)
+    this.sceneManager.setInitialCameraPosition(playerTowerPos, aiTowerPos);
+
     // Initialize AI
     this.aiSystem.initialize(aiTower);
 
@@ -181,15 +197,21 @@ export class Game {
     // Spawn initial resources
     this.resourceSystem.spawnRandomResources(20);
 
-    // Initialize UI
+    // Initialize UI (pass placement system for building menu)
     const camera = this.sceneManager.getCamera();
     this.gameUI = new GameUI(
       this.waveSystem, 
       this.buildingSystem,
       this.resourceSystem,
       this.servantSystem,
-      camera
+      camera,
+      this.buildingPlacementSystem
     );
+
+    // Initialize console system
+    const consoleUI = new ConsoleUI('console');
+    this.consoleSystem = new ConsoleSystem(consoleUI);
+    this.setupConsoleToggle();
 
     // Start render loop
     this.sceneManager.render();
@@ -207,6 +229,26 @@ export class Game {
       playerTower: playerTower.getPosition(), 
       aiTower: aiTower.getPosition(),
       initialResources: this.resourceSystem.getAllResources().length
+    });
+  }
+
+  /**
+   * Setup console toggle with keyboard shortcut (backtick key)
+   */
+  private setupConsoleToggle(): void {
+    document.addEventListener('keydown', (e) => {
+      // Backtick key (usually above Tab, next to 1)
+      // Key code: Backquote (192) or GraveAccent
+      if (e.key === '`' || e.key === '~' || e.code === 'Backquote') {
+        // Prevent default to avoid typing backtick in input fields
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (this.consoleSystem) {
+          this.consoleSystem.toggle();
+          this.logger.debug('Console toggled', { visible: this.consoleSystem.isVisible() });
+        }
+      }
     });
   }
 
@@ -264,10 +306,13 @@ export class Game {
       return;
     }
 
-    // Update systems
-    if (this.interactionSystem) {
-      this.interactionSystem.update();
-    }
+      // Update systems
+      if (this.buildingPlacementSystem) {
+        this.buildingPlacementSystem.update();
+      }
+      if (this.interactionSystem) {
+        this.interactionSystem.update();
+      }
 
     if (this.servantSystem) {
       this.servantSystem.update();

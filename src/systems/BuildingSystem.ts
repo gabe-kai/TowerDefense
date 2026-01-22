@@ -265,11 +265,15 @@ export class BuildingSystem {
 
   /**
    * Build ground structure
+   * @param useStilts If true, adds visual stilts/foundations for uneven terrain
+   * @returns Object with success status and optional error reason
    */
-  buildGroundStructure(buildingType: BuildingType, position: Vector3, player: 'player' | 'ai'): boolean {
+  buildGroundStructure(buildingType: BuildingType, position: Vector3, player: 'player' | 'ai', useStilts: boolean = false): { success: boolean; reason?: string } {
     const def = this.buildingDefinitions.get(buildingType);
     if (!def) {
-      return false;
+      const reason = `Building type ${buildingType} not found`;
+      this.logger.error('Building definition not found', undefined, { buildingType });
+      return { success: false, reason };
     }
 
     // Validate placement
@@ -283,15 +287,26 @@ export class BuildingSystem {
     );
 
     if (!validation.valid) {
-      return false;
+      const reason = validation.reason || 'Invalid placement location';
+      this.logger.warn('Placement validation failed', { buildingType, position, reason });
+      return { success: false, reason };
     }
 
     // Check resources
     const resources = this.stateManager.getResources(player);
+    const missingResources: string[] = [];
     for (const [resource, amount] of Object.entries(def.cost)) {
       if (amount && (resources[resource as keyof typeof resources] < amount)) {
-        return false;
+        const needed = amount;
+        const have = resources[resource as keyof typeof resources];
+        missingResources.push(`${resource}: need ${needed}, have ${have}`);
       }
+    }
+
+    if (missingResources.length > 0) {
+      const reason = `Insufficient resources: ${missingResources.join(', ')}`;
+      this.logger.warn('Insufficient resources', { buildingType, missingResources });
+      return { success: false, reason };
     }
 
     // Deduct resources
@@ -301,16 +316,7 @@ export class BuildingSystem {
       }
     }
 
-    // Create actual 3D mesh for the structure
-    const buildingMesh = this.primitiveFactory.createGroundStructure(buildingType, position);
-    buildingMesh.metadata = { 
-      ...buildingMesh.metadata,
-      buildingType,
-      player,
-      structureId: `${player}_${buildingType}_${Date.now()}`
-    };
-
-    // Create building component
+    // Create building component first
     const component = new BuildingComponent(
       buildingType,
       def.roomType,
@@ -325,20 +331,42 @@ export class BuildingSystem {
       }
     );
 
-    const structureId = buildingMesh.metadata.structureId;
-    this.groundStructures.set(structureId, {
-      mesh: buildingMesh,
-      component
-    });
+    // Create actual 3D mesh for the structure
+    // Convert BuildingType enum to string (enum values are already strings)
+    try {
+      const buildingMesh = this.primitiveFactory.createGroundStructure(buildingType as string, position, useStilts);
+      const structureId = `${player}_${buildingType}_${Date.now()}`;
+      buildingMesh.metadata = { 
+        ...buildingMesh.metadata,
+        building: true,
+        buildingType,
+        player,
+        structureId,
+        component, // Store component reference for info panel
+        useStilts // Store stilts flag
+      };
+      this.groundStructures.set(structureId, {
+        mesh: buildingMesh,
+        component
+      });
 
-    this.logger.info('Ground structure built', { 
-      buildingType, 
-      position, 
-      player,
-      structureId 
-    });
+      this.logger.info('Ground structure built', { 
+        buildingType, 
+        position, 
+        player,
+        structureId 
+      });
 
-    return true;
+      return { success: true };
+    } catch (error) {
+      const reason = `Failed to create building mesh: ${error instanceof Error ? error.message : String(error)}`;
+      this.logger.error(
+        'Failed to create building mesh',
+        error instanceof Error ? error : undefined,
+        { buildingType, position, error }
+      );
+      return { success: false, reason };
+    }
   }
 
   /**

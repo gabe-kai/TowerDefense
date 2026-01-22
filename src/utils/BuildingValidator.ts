@@ -39,8 +39,12 @@ export class BuildingValidator {
           reason: 'Tower floor must be attached to tower'
         };
       }
-      const distance = Vector3.Distance(position, towerPosition);
-      if (distance > 1.5) {
+      // Check horizontal distance only (ignore Y difference for stacking)
+      const horizontalDistance = Math.sqrt(
+        Math.pow(position.x - towerPosition.x, 2) + 
+        Math.pow(position.z - towerPosition.z, 2)
+      );
+      if (horizontalDistance > 1.5) {
         return {
           valid: false,
           reason: 'Tower floor must be directly above tower'
@@ -48,24 +52,8 @@ export class BuildingValidator {
       }
     }
 
-    // Check if position is on ground level (for ground structures)
-    const groundStructures = [
-      BuildingType.TURRET,
-      BuildingType.CANNON,
-      BuildingType.WALL,
-      BuildingType.BARRIER,
-      BuildingType.STORAGE,
-      BuildingType.WORKSHOP,
-      BuildingType.BARRACKS,
-      BuildingType.LIBRARY
-    ];
-
-    if (groundStructures.includes(buildingType) && position.y > 0.5) {
-      return {
-        valid: false,
-        reason: 'Ground structure must be placed on ground level'
-      };
-    }
+    // Removed ground level check - terrain height varies, so we allow placement at any terrain height
+    // Terrain slope validation is handled separately by TerrainManager
 
     return { valid: true };
   }

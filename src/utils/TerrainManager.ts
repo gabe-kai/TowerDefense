@@ -66,10 +66,17 @@ export class TerrainManager {
   /**
    * Check if position is valid for building
    * @param position World position to check
-   * @param maxSlope Maximum allowed slope in degrees (default: 20°)
+   * @param maxSlope Maximum allowed slope in degrees (default: 30° - more lenient)
+   * @param allowStilts If true, allows building on steeper terrain with stilts (default: false)
    */
-  isValidBuildLocation(position: Vector3, maxSlope: number = 20): boolean {
+  isValidBuildLocation(position: Vector3, maxSlope: number = 30, allowStilts: boolean = false): boolean {
     const slope = this.getSlopeAngle(position.x, position.z);
+    
+    if (allowStilts) {
+      // With stilts, allow up to 45° slope
+      return slope <= 45;
+    }
+    
     return slope <= maxSlope;
   }
 
