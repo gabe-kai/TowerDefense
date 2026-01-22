@@ -11,10 +11,15 @@ import { EnemySystem } from '../systems/EnemySystem';
 import { WaveSystem } from '../systems/WaveSystem';
 import { AISystem } from '../systems/AISystem';
 import { InteractionSystem } from '../systems/InteractionSystem';
+import { ConsoleSystem } from '../systems/ConsoleSystem';
+import { BuildingPlacementSystem } from '../systems/BuildingPlacementSystem';
 import { GameUI } from '../ui/GameUI';
+import { ConsoleUI } from '../ui/ConsoleUI';
 import { PowerCalculator } from '../utils/PowerCalculator';
 import { Vector3 } from '@babylonjs/core';
 import { createCategoryLogger } from '../utils/Logger';
+import { GameScale } from '../utils/GameScale';
+import { SeededRandom } from '../utils/SeededRandom';
 
 export class Game {
   private sceneManager: SceneManager | null = null;
@@ -30,15 +35,18 @@ export class Game {
   private waveSystem: WaveSystem | null = null;
   private aiSystem: AISystem | null = null;
   private interactionSystem: InteractionSystem | null = null;
+  private buildingPlacementSystem: BuildingPlacementSystem | null = null;
   private gameUI: GameUI | null = null;
+  private consoleSystem: ConsoleSystem | null = null;
   private powerCalculator: PowerCalculator;
   private logger = createCategoryLogger('Game');
+  private seededRandom: SeededRandom;
 
   // Game loop
   private lastUpdateTime: number = 0;
   private updateInterval: number = 16; // ~60 FPS
 
-  constructor(canvasId: string) {
+  constructor(canvasId: string, seed?: number) {
     const canvasElement = document.getElementById(canvasId);
     if (!canvasElement || !(canvasElement instanceof HTMLCanvasElement)) {
       throw new Error(`Canvas element with id "${canvasId}" not found`);
@@ -46,18 +54,39 @@ export class Game {
     this.canvas = canvasElement;
     this.stateManager = GameStateManager.getInstance();
     this.powerCalculator = PowerCalculator.getInstance();
+    
+    // Initialize seeded random number generator
+    // Check for seed in URL parameter, otherwise generate new seed
+    const urlParams = new URLSearchParams(window.location.search);
+    const seedParam = urlParams.get('seed');
+    const gameSeed = seedParam ? parseInt(seedParam, 10) : seed;
+    
+    this.seededRandom = new SeededRandom(gameSeed);
+    const seedValue = this.seededRandom.getSeed();
+    this.logger.info('Game initialized with seeded randomization', { 
+      seed: seedValue,
+      seedUrl: `?seed=${seedValue}`,
+      note: 'Use ?seed=<number> in URL to replay with same terrain'
+    });
+    
+    // Log seed to console for easy sharing
+    console.log(`%cGame Seed: ${seedValue}`, 'color: #4CAF50; font-weight: bold; font-size: 14px;');
+    console.log(`%cReplay URL: ${window.location.origin}${window.location.pathname}?seed=${seedValue}`, 'color: #2196F3;');
   }
 
   /**
    * Initialize the game
    */
   async initialize(): Promise<void> {
-    // Create scene
-    this.sceneManager = new SceneManager(this.canvas);
+    // Create scene with seeded random for terrain generation
+    this.sceneManager = new SceneManager(this.canvas, this.seededRandom);
     const scene = this.sceneManager.getScene();
+    
+    // Get terrain manager early (needed for resource system)
+    const terrainManager = this.sceneManager.getTerrainManager();
 
     // Initialize systems
-    this.resourceSystem = new ResourceSystem(scene);
+    this.resourceSystem = new ResourceSystem(scene, terrainManager || undefined);
     this.servantSystem = new ServantSystem(scene);
     this.buildingSystem = new BuildingSystem(scene);
     this.enemySystem = new EnemySystem(scene);
@@ -68,41 +97,121 @@ export class Game {
       this.buildingSystem
     );
     
+    // Initialize building placement system
+    this.buildingPlacementSystem = new BuildingPlacementSystem(
+      scene,
+      this.buildingSystem,
+      terrainManager || undefined
+    );
+
     // Initialize interaction system (handles clicks, hover)
     this.interactionSystem = new InteractionSystem(
       scene,
       this.servantSystem,
       this.resourceSystem,
-      this.buildingSystem
+      this.buildingSystem,
+      this.buildingPlacementSystem
     );
 
-    // Create towers
-    const playerTowerPos = new Vector3(-20, 2, 0);
-    const aiTowerPos = new Vector3(20, 2, 0);
+    // Create towers positioned 2km apart on opposite sides of the valley
+    // Towers are placed on hills with slight randomization
+    
+    // Base positions: 2km apart (1000m on each side of center)
+    const baseDistance = GameScale.TOWER_DISTANCE / 2; // 1000m from center
+    const randomization = GameScale.TOWER_RANDOMIZATION_RANGE; // ±500m (expanded)
+    
+    // Find best tower positions with bias toward higher ground
+    // Sample multiple candidate positions and pick the highest ones
+    const findBestTowerPosition = (baseX: number, baseZ: number, side: 'player' | 'ai'): Vector3 => {
+      const candidates: Array<{ x: number; z: number; y: number }> = [];
+      
+      // Generate candidate positions within randomization range
+      for (let i = 0; i < GameScale.TOWER_PLACEMENT_SAMPLES; i++) {
+        const offsetX = (this.seededRandom.next() - 0.5) * randomization;
+        const offsetZ = (this.seededRandom.next() - 0.5) * randomization;
+        const candidateX = baseX + offsetX;
+        const candidateZ = baseZ + offsetZ;
+        
+        if (terrainManager) {
+          const candidateY = terrainManager.getHeightAt(candidateX, candidateZ);
+          // Adjusted for raised terrain (base elevation +10m, so sea level is effectively -10m)
+          const seaLevel = -10.0;
+          const landThreshold = -9.0; // At least 1m above sea level (now -9m)
+          
+          // Only consider positions on land
+          if (candidateY > landThreshold) {
+            candidates.push({ x: candidateX, z: candidateZ, y: candidateY });
+          }
+        }
+      }
+      
+      // Sort by elevation (highest first) and pick the best
+      candidates.sort((a, b) => b.y - a.y);
+      
+      if (candidates.length > 0) {
+        const best = candidates[0];
+        this.logger.debug(`Best ${side} tower position found`, { 
+          x: best.x, 
+          z: best.z, 
+          elevation: best.y,
+          candidatesTested: candidates.length 
+        });
+        return new Vector3(best.x, best.y, best.z);
+      }
+      
+      // Fallback: use base position
+      const fallbackY = terrainManager ? terrainManager.getHeightAt(baseX, baseZ) : 0;
+      const landThreshold = -9.0; // Adjusted for raised terrain
+      this.logger.warn(`No valid ${side} tower position found, using base position`, { x: baseX, z: baseZ });
+      return new Vector3(baseX, Math.max(fallbackY, landThreshold), baseZ);
+    };
+    
+    // Find best positions for both towers (with bias toward higher ground)
+    const playerTowerPos = findBestTowerPosition(-baseDistance, 0, 'player');
+    const aiTowerPos = findBestTowerPosition(baseDistance, 0, 'ai');
+    
     const playerTower = this.buildingSystem.createPlayerTower(playerTowerPos);
     const aiTower = this.buildingSystem.createAITower(aiTowerPos);
+
+    // Set initial camera position (behind player house, looking toward AI tower)
+    this.sceneManager.setInitialCameraPosition(playerTowerPos, aiTowerPos);
 
     // Initialize AI
     this.aiSystem.initialize(aiTower);
 
-    // Create initial servant for player (on ground level, near tower)
+    // Create initial servant for player (on terrain, near tower)
+    // Servant cylinder center should be at half its height above terrain
     const servantPos = playerTowerPos.clone();
-    servantPos.x += 2; // 2 units to the right of tower
-    servantPos.y = 0.5; // On ground level (cylinder height is 0.5, so center at 0.5 puts bottom on ground)
+    servantPos.x += 2; // 2 meters to the right of tower
+    
+    // Sample terrain height for servant position
+    if (terrainManager) {
+      const terrainHeight = terrainManager.getHeightAt(servantPos.x, servantPos.z);
+      servantPos.y = terrainHeight + GameScale.SERVANT_HEIGHT / 2; // Half height above terrain
+    } else {
+      servantPos.y = GameScale.SERVANT_HEIGHT / 2; // Fallback to ground level
+    }
+    
     this.servantSystem.createServant(servantPos, 'player');
 
     // Spawn initial resources
     this.resourceSystem.spawnRandomResources(20);
 
-    // Initialize UI
+    // Initialize UI (pass placement system for building menu)
     const camera = this.sceneManager.getCamera();
     this.gameUI = new GameUI(
       this.waveSystem, 
       this.buildingSystem,
       this.resourceSystem,
       this.servantSystem,
-      camera
+      camera,
+      this.buildingPlacementSystem
     );
+
+    // Initialize console system
+    const consoleUI = new ConsoleUI('console');
+    this.consoleSystem = new ConsoleSystem(consoleUI);
+    this.setupConsoleToggle();
 
     // Start render loop
     this.sceneManager.render();
@@ -120,6 +229,26 @@ export class Game {
       playerTower: playerTower.getPosition(), 
       aiTower: aiTower.getPosition(),
       initialResources: this.resourceSystem.getAllResources().length
+    });
+  }
+
+  /**
+   * Setup console toggle with keyboard shortcut (backtick key)
+   */
+  private setupConsoleToggle(): void {
+    document.addEventListener('keydown', (e) => {
+      // Backtick key (usually above Tab, next to 1)
+      // Key code: Backquote (192) or GraveAccent
+      if (e.key === '`' || e.key === '~' || e.code === 'Backquote') {
+        // Prevent default to avoid typing backtick in input fields
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (this.consoleSystem) {
+          this.consoleSystem.toggle();
+          this.logger.debug('Console toggled', { visible: this.consoleSystem.isVisible() });
+        }
+      }
     });
   }
 
@@ -162,16 +291,28 @@ export class Game {
    * Update game systems
    */
   private update(): void {
+    const currentTime = Date.now();
+    const deltaTime = (currentTime - this.lastUpdateTime) / 1000;
+    
+    // Always update camera controls (even when paused)
+    if (this.sceneManager) {
+      this.sceneManager.updateCamera(deltaTime);
+    }
+
     if (this.stateManager.getPhase() !== GamePhase.PLAYING && 
         this.stateManager.getPhase() !== GamePhase.WAVE_ACTIVE &&
         this.stateManager.getPhase() !== GamePhase.WAVE_COUNTDOWN) {
+      this.lastUpdateTime = currentTime; // Update time even when paused
       return;
     }
 
-    // Update systems
-    if (this.interactionSystem) {
-      this.interactionSystem.update();
-    }
+      // Update systems
+      if (this.buildingPlacementSystem) {
+        this.buildingPlacementSystem.update();
+      }
+      if (this.interactionSystem) {
+        this.interactionSystem.update();
+      }
 
     if (this.servantSystem) {
       this.servantSystem.update();

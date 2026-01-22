@@ -2,7 +2,7 @@
  * Building System - Building placement, upgrades, modular floors
  */
 
-import { Scene, Vector3 } from '@babylonjs/core';
+import { Scene, Vector3, Mesh } from '@babylonjs/core';
 import { Tower } from '../entities/Tower';
 import { BuildingComponent, BuildingType, RoomType } from '../components/BuildingComponent';
 import { BuildingValidator } from '../utils/BuildingValidator';
@@ -10,6 +10,7 @@ import { GameStateManager } from '../core/GameState';
 import { AssetCatalog, AssetCategory, AssetType } from '../assets/AssetCatalog';
 import { PowerCalculator } from '../utils/PowerCalculator';
 import { createCategoryLogger } from '../utils/Logger';
+import { PrimitiveFactory } from '../assets/PrimitiveFactory';
 
 export interface BuildingDefinition {
   type: BuildingType;
@@ -34,10 +35,11 @@ export class BuildingSystem {
   private scene: Scene;
   private playerTower: Tower | null = null;
   private aiTower: Tower | null = null;
-  private groundStructures: Map<string, { mesh: any; component: BuildingComponent }> = new Map();
+  private groundStructures: Map<string, { mesh: Mesh; component: BuildingComponent }> = new Map();
   private stateManager: GameStateManager;
   private catalog: AssetCatalog;
   private powerCalculator: PowerCalculator;
+  private primitiveFactory: PrimitiveFactory;
   private logger = createCategoryLogger('BuildingSystem');
 
   // Building definitions
@@ -48,6 +50,8 @@ export class BuildingSystem {
     this.stateManager = GameStateManager.getInstance();
     this.catalog = AssetCatalog.getInstance();
     this.powerCalculator = PowerCalculator.getInstance();
+    this.primitiveFactory = PrimitiveFactory.getInstance();
+    this.primitiveFactory.initialize(scene);
     
     this.initializeBuildingDefinitions();
     this.registerBuildingAssets();
@@ -156,10 +160,7 @@ export class BuildingSystem {
    * Create player tower
    */
   createPlayerTower(position: Vector3): Tower {
-    const tower = new Tower(position, 'player');
-    this.playerTower = tower;
-    
-    // Initialize base component
+    // Initialize base component first
     const baseDef = this.buildingDefinitions.get(BuildingType.TOWER_BASE)!;
     const baseComponent = new BuildingComponent(
       BuildingType.TOWER_BASE,
@@ -172,7 +173,10 @@ export class BuildingSystem {
         cost: baseDef.cost
       }
     );
-    tower.getBaseMesh().metadata = { component: baseComponent };
+    
+    // Create tower with base component (tower creates house separately)
+    const tower = new Tower(position, 'player', baseComponent);
+    this.playerTower = tower;
 
     this.stateManager.setTowerHeight('player', tower.getHeight());
     this.logger.info('Player tower created', { position, height: tower.getHeight() });
@@ -183,10 +187,7 @@ export class BuildingSystem {
    * Create AI tower
    */
   createAITower(position: Vector3): Tower {
-    const tower = new Tower(position, 'ai');
-    this.aiTower = tower;
-    
-    // Initialize base component
+    // Initialize base component first
     const baseDef = this.buildingDefinitions.get(BuildingType.TOWER_BASE)!;
     const baseComponent = new BuildingComponent(
       BuildingType.TOWER_BASE,
@@ -199,7 +200,10 @@ export class BuildingSystem {
         cost: baseDef.cost
       }
     );
-    tower.getBaseMesh().metadata = { component: baseComponent };
+    
+    // Create tower with base component (tower creates house separately)
+    const tower = new Tower(position, 'ai', baseComponent);
+    this.aiTower = tower;
 
     this.stateManager.setTowerHeight('ai', tower.getHeight());
     return tower;
@@ -261,11 +265,15 @@ export class BuildingSystem {
 
   /**
    * Build ground structure
+   * @param useStilts If true, adds visual stilts/foundations for uneven terrain
+   * @returns Object with success status and optional error reason
    */
-  buildGroundStructure(buildingType: BuildingType, position: Vector3, player: 'player' | 'ai'): boolean {
+  buildGroundStructure(buildingType: BuildingType, position: Vector3, player: 'player' | 'ai', useStilts: boolean = false): { success: boolean; reason?: string } {
     const def = this.buildingDefinitions.get(buildingType);
     if (!def) {
-      return false;
+      const reason = `Building type ${buildingType} not found`;
+      this.logger.error('Building definition not found', undefined, { buildingType });
+      return { success: false, reason };
     }
 
     // Validate placement
@@ -279,15 +287,26 @@ export class BuildingSystem {
     );
 
     if (!validation.valid) {
-      return false;
+      const reason = validation.reason || 'Invalid placement location';
+      this.logger.warn('Placement validation failed', { buildingType, position, reason });
+      return { success: false, reason };
     }
 
     // Check resources
     const resources = this.stateManager.getResources(player);
+    const missingResources: string[] = [];
     for (const [resource, amount] of Object.entries(def.cost)) {
       if (amount && (resources[resource as keyof typeof resources] < amount)) {
-        return false;
+        const needed = amount;
+        const have = resources[resource as keyof typeof resources];
+        missingResources.push(`${resource}: need ${needed}, have ${have}`);
       }
+    }
+
+    if (missingResources.length > 0) {
+      const reason = `Insufficient resources: ${missingResources.join(', ')}`;
+      this.logger.warn('Insufficient resources', { buildingType, missingResources });
+      return { success: false, reason };
     }
 
     // Deduct resources
@@ -297,8 +316,7 @@ export class BuildingSystem {
       }
     }
 
-    // Create structure (simplified for MVP - would use PrimitiveFactory)
-    // For now, just register it
+    // Create building component first
     const component = new BuildingComponent(
       buildingType,
       def.roomType,
@@ -313,13 +331,42 @@ export class BuildingSystem {
       }
     );
 
-    const structureId = `${player}_${buildingType}_${Date.now()}`;
-    this.groundStructures.set(structureId, {
-      mesh: { position } as any, // Placeholder
-      component
-    });
+    // Create actual 3D mesh for the structure
+    // Convert BuildingType enum to string (enum values are already strings)
+    try {
+      const buildingMesh = this.primitiveFactory.createGroundStructure(buildingType as string, position, useStilts);
+      const structureId = `${player}_${buildingType}_${Date.now()}`;
+      buildingMesh.metadata = { 
+        ...buildingMesh.metadata,
+        building: true,
+        buildingType,
+        player,
+        structureId,
+        component, // Store component reference for info panel
+        useStilts // Store stilts flag
+      };
+      this.groundStructures.set(structureId, {
+        mesh: buildingMesh,
+        component
+      });
 
-    return true;
+      this.logger.info('Ground structure built', { 
+        buildingType, 
+        position, 
+        player,
+        structureId 
+      });
+
+      return { success: true };
+    } catch (error) {
+      const reason = `Failed to create building mesh: ${error instanceof Error ? error.message : String(error)}`;
+      this.logger.error(
+        'Failed to create building mesh',
+        error instanceof Error ? error : undefined,
+        { buildingType, position, error }
+      );
+      return { success: false, reason };
+    }
   }
 
   /**

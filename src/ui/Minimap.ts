@@ -2,7 +2,7 @@
  * Minimap - Shows game world overview with camera position and direction
  */
 
-import { ArcRotateCamera, Vector3 } from '@babylonjs/core';
+import { FreeCamera, Vector3 } from '@babylonjs/core';
 import { BuildingSystem } from '../systems/BuildingSystem';
 import { ResourceSystem } from '../systems/ResourceSystem';
 import { ServantSystem } from '../systems/ServantSystem';
@@ -11,7 +11,7 @@ export class Minimap {
   private container: HTMLDivElement;
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-  private camera: ArcRotateCamera | null = null;
+  private camera: FreeCamera | null = null;
   private buildingSystem: BuildingSystem | null = null;
   private resourceSystem: ResourceSystem | null = null;
   private servantSystem: ServantSystem | null = null;
@@ -60,7 +60,7 @@ export class Minimap {
   /**
    * Set camera reference for tracking
    */
-  setCamera(camera: ArcRotateCamera): void {
+  setCamera(camera: FreeCamera): void {
     this.camera = camera;
   }
 
@@ -244,11 +244,11 @@ export class Minimap {
     this.ctx.fill();
 
     // Draw camera facing direction
-    // ArcRotateCamera alpha is horizontal rotation (around Y axis)
-    const alpha = this.camera.alpha;
+    // FreeCamera uses rotation.y for yaw (horizontal rotation around Y axis)
+    const yaw = this.camera.rotation.y;
     const directionLength = 15;
-    const dirX = Math.cos(alpha) * directionLength;
-    const dirY = -Math.sin(alpha) * directionLength; // Negative because screen Y is inverted
+    const dirX = Math.cos(yaw) * directionLength;
+    const dirY = -Math.sin(yaw) * directionLength; // Negative because screen Y is inverted
 
     this.ctx.strokeStyle = '#ffff00';
     this.ctx.lineWidth = 2;

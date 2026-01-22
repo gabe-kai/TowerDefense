@@ -8,6 +8,7 @@ import { Pathfinding } from '../utils/Pathfinding';
 import { Resource } from './Resource';
 import { ResourceType } from '../components/ResourceComponent';
 import { createCategoryLogger } from '../utils/Logger';
+import { GameScale } from '../utils/GameScale';
 
 export enum ServantState {
   IDLE = 'idle',
@@ -29,7 +30,7 @@ export class Servant {
   private commandQueue: Command[] = [];
   private currentPath: Vector3[] = [];
   private currentPathIndex: number = 0;
-  private speed: number = 2.0; // units per second
+  private speed: number = GameScale.SERVANT_SPEED; // meters per second (realistic walking speed)
   private homePosition: Vector3;
   private carryingResource: Resource | null = null;
   private primitiveFactory: PrimitiveFactory;
@@ -39,7 +40,7 @@ export class Servant {
   private originalEmissiveColor: Color3 | null = null; // Store original emissive color for movement glow
   private workingTime: number = 0; // Time spent working at resource
   private workingDuration: number = 1.0; // Seconds to work at resource before collecting
-  private baseYPosition: number = 0.5; // Base Y position for working animation
+  private baseYPosition: number = GameScale.SERVANT_HEIGHT / 2; // Base Y position for working animation (servant center)
 
   constructor(name: string, position: Vector3, scene?: Scene) {
     this.primitiveFactory = PrimitiveFactory.getInstance();
@@ -208,7 +209,7 @@ export class Servant {
 
     // If returning home and reached home
     if (this.state === ServantState.RETURNING && 
-        Vector3.Distance(this.mesh.position, this.homePosition) < 1.0) {
+        Vector3.Distance(this.mesh.position, this.homePosition) < 1.5) { // Within 1.5 meters
       this.deliverResourceToTower();
     }
   }
@@ -278,8 +279,9 @@ export class Servant {
    * Get resource being delivered (call when at home)
    */
   deliverResource(): Resource | null {
-    if (this.state === ServantState.RETURNING && 
-        Vector3.Distance(this.mesh.position, this.homePosition) < 1.0 &&
+      // Check if close enough to home (within 1.5 meters - reasonable delivery range)
+      if (this.state === ServantState.RETURNING && 
+        Vector3.Distance(this.mesh.position, this.homePosition) < 1.5 &&
         this.carryingResource) {
       const resource = this.carryingResource;
       this.removeCarryingIndicator();
@@ -325,14 +327,16 @@ export class Servant {
     this.logger.debug('Creating carrying indicator', { resourceType });
 
     // Create a small sphere above the servant to represent the resource
-    this.carryingIndicator = Mesh.CreateSphere('carrying_indicator', 8, 0.3, this.scene);
+    this.carryingIndicator = Mesh.CreateSphere('carrying_indicator', 8, GameScale.CARRYING_INDICATOR_SIZE, this.scene);
     
     // Make it a child of the servant mesh FIRST so position is relative to parent
     this.carryingIndicator.parent = this.mesh;
     
     // Position it just above the servant's head (servant height is 1.2, so top is at +0.6)
-    // Position at +0.65 to have it almost touching the head (relative to parent center)
-    this.carryingIndicator.position = new Vector3(0, 0.65, 0); // Local position relative to parent
+    // Position above servant's head (relative to parent center)
+    // Servant height is 1.7m, center is at 0.85m, so head is at ~1.6m from bottom
+    // Indicator should be slightly above head: ~1.8m from bottom = 0.95m above center
+    this.carryingIndicator.position = new Vector3(0, GameScale.CARRYING_INDICATOR_OFFSET, 0); // Local position relative to parent
     
     // Set material color based on resource type
     const material = new StandardMaterial('carrying_material', this.scene);
@@ -383,10 +387,10 @@ export class Servant {
     );
 
     // Since it's a child, position.y is relative to parent
-    const baseY = 0.65; // Base offset above servant (almost touching head)
+    const baseY = GameScale.CARRYING_INDICATOR_OFFSET; // Base offset above servant (head level)
     const keys = [
       { frame: 0, value: baseY },
-      { frame: 30, value: baseY + 0.15 }, // Smaller float range for closer indicator
+      { frame: 30, value: baseY + GameScale.WORKING_BOBBING_RANGE }, // Subtle floating animation
       { frame: 60, value: baseY }
     ];
     animation.setKeys(keys);

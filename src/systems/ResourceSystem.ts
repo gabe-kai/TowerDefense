@@ -7,6 +7,8 @@ import { Resource } from '../entities/Resource';
 import { ResourceComponent, ResourceType } from '../components/ResourceComponent';
 import { AssetCatalog, AssetCategory, AssetType } from '../assets/AssetCatalog';
 import { createCategoryLogger } from '../utils/Logger';
+import { GameScale } from '../utils/GameScale';
+import { TerrainManager } from '../utils/TerrainManager';
 
 export interface ResourceSpawnConfig {
   type: ResourceType;
@@ -20,15 +22,21 @@ export class ResourceSystem {
   private resources: Resource[] = [];
   private catalog: AssetCatalog;
   private logger = createCategoryLogger('ResourceSystem');
+  private terrainManager: TerrainManager | null = null;
   
-  // Valley bounds for spawning
+  // Valley bounds for spawning (use full map, avoid tower areas)
   private valleyBounds = {
-    minX: -20,
-    maxX: 20,
-    minZ: -20,
-    maxZ: 20,
-    y: 0.5
+    minX: -GameScale.MAP_WIDTH / 2 + 300, // Keep resources away from map edges
+    maxX: GameScale.MAP_WIDTH / 2 - 300,
+    minZ: -GameScale.MAP_DEPTH / 2 + 300,
+    maxZ: GameScale.MAP_DEPTH / 2 - 300,
+    y: GameScale.VALLEY_FLOOR_HEIGHT // Resources spawn at valley floor level
   };
+  
+  // Sea level - resources below this are in water
+  // Adjusted for raised terrain (base elevation +10m, so sea level is effectively -10m)
+  private readonly SEA_LEVEL = -10.0; // meters (adjusted for raised terrain)
+  private readonly LAND_THRESHOLD = -9.5; // meters (minimum elevation for land placement, 0.5m above sea level)
 
   // Resource spawn configuration
   private spawnConfigs: ResourceSpawnConfig[] = [
@@ -40,10 +48,52 @@ export class ResourceSystem {
     { type: ResourceType.MANA, minAmount: 1, maxAmount: 1, spawnChance: 0.1 }
   ];
 
-  constructor(scene: Scene) {
+  constructor(scene: Scene, terrainManager?: TerrainManager) {
     this.scene = scene;
     this.catalog = AssetCatalog.getInstance();
+    this.terrainManager = terrainManager || null;
     this.registerResourceAssets();
+  }
+  
+  /**
+   * Set terrain manager for height sampling
+   */
+  setTerrainManager(terrainManager: TerrainManager): void {
+    this.terrainManager = terrainManager;
+  }
+  
+  /**
+   * Check if resource type can be placed in water
+   */
+  private canBeInWater(type: ResourceType): boolean {
+    // Most resources must be on land
+    // GOLD and MANA could potentially be in water (magical/underwater deposits)
+    return type === ResourceType.GOLD || type === ResourceType.MANA;
+  }
+  
+  /**
+   * Check if position is valid for resource placement
+   */
+  private isValidResourcePosition(position: Vector3, type: ResourceType): boolean {
+    if (!this.terrainManager) {
+      return true; // No terrain manager, allow placement
+    }
+    
+    const elevation = this.terrainManager.getHeightAt(position.x, position.z);
+    const isInWater = elevation <= this.SEA_LEVEL;
+    const isOnLand = elevation > this.LAND_THRESHOLD;
+    
+    // Check if resource can be in water
+    if (isInWater && !this.canBeInWater(type)) {
+      return false; // Resource type cannot be in water
+    }
+    
+    // For land-only resources, ensure they're on land
+    if (!this.canBeInWater(type) && !isOnLand) {
+      return false; // Not high enough above sea level
+    }
+    
+    return true;
   }
 
   private registerResourceAssets(): void {
@@ -65,13 +115,43 @@ export class ResourceSystem {
    */
   spawnResource(type?: ResourceType, position?: Vector3): Resource {
     const resourceType = type || this.getRandomResourceType();
-    const spawnPosition = position || this.getRandomSpawnPosition();
+    
+    // If position provided, sample terrain height; otherwise get random position
+    let spawnPosition: Vector3;
+    if (position) {
+      // Sample terrain height at provided position
+      let y = position.y;
+      if (this.terrainManager) {
+        y = this.terrainManager.getHeightAt(position.x, position.z);
+      }
+      spawnPosition = new Vector3(position.x, y, position.z);
+      
+      // Validate placement
+      if (!this.isValidResourcePosition(spawnPosition, resourceType)) {
+        this.logger.warn('Invalid resource position, adjusting', { 
+          type: resourceType, 
+          originalPosition: position,
+          sampledPosition: spawnPosition 
+        });
+        // Try to find a valid position nearby
+        spawnPosition = this.getRandomSpawnPosition(resourceType);
+      }
+    } else {
+      spawnPosition = this.getRandomSpawnPosition(resourceType);
+    }
+    
     const amount = this.getRandomAmount(resourceType);
 
     const resource = new Resource(resourceType, spawnPosition, amount);
     this.resources.push(resource);
 
-    this.logger.debug('Resource spawned', { type: resourceType, amount, position: spawnPosition });
+    this.logger.debug('Resource spawned', { 
+      type: resourceType, 
+      amount, 
+      position: spawnPosition,
+      elevation: spawnPosition.y,
+      inWater: spawnPosition.y <= this.SEA_LEVEL
+    });
     return resource;
   }
 
@@ -111,29 +191,37 @@ export class ResourceSystem {
   }
 
   /**
-   * Get random spawn position in valley
+   * Get random spawn position in valley, sampled on terrain
    */
-  private getRandomSpawnPosition(): Vector3 {
+  private getRandomSpawnPosition(type?: ResourceType): Vector3 {
     // Avoid spawning on hills (where towers are)
     const avoidZones = [
-      { center: new Vector3(-20, 0, 0), radius: 5 },
-      { center: new Vector3(20, 0, 0), radius: 5 }
+      { center: new Vector3(-GameScale.TOWER_DISTANCE / 2, 0, 0), radius: 300 },
+      { center: new Vector3(GameScale.TOWER_DISTANCE / 2, 0, 0), radius: 300 }
     ];
 
     let position: Vector3;
     let attempts = 0;
-    const maxAttempts = 50;
+    const maxAttempts = 100; // Increased attempts for terrain validation
 
     do {
-      position = new Vector3(
-        this.valleyBounds.minX + Math.random() * (this.valleyBounds.maxX - this.valleyBounds.minX),
-        this.valleyBounds.y,
-        this.valleyBounds.minZ + Math.random() * (this.valleyBounds.maxZ - this.valleyBounds.minZ)
-      );
+      const x = this.valleyBounds.minX + Math.random() * (this.valleyBounds.maxX - this.valleyBounds.minX);
+      const z = this.valleyBounds.minZ + Math.random() * (this.valleyBounds.maxZ - this.valleyBounds.minZ);
+      
+      // Sample terrain height at this position
+      let y = this.valleyBounds.y;
+      if (this.terrainManager) {
+        y = this.terrainManager.getHeightAt(x, z);
+      }
+      
+      position = new Vector3(x, y, z);
       attempts++;
     } while (
       attempts < maxAttempts &&
-      avoidZones.some(zone => Vector3.Distance(position, zone.center) < zone.radius)
+      (
+        avoidZones.some(zone => Vector3.Distance(position, zone.center) < zone.radius) ||
+        (type && !this.isValidResourcePosition(position, type))
+      )
     );
 
     return position;

@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Compass } from '../Compass';
-import { ArcRotateCamera } from '@babylonjs/core';
+import { FreeCamera } from '@babylonjs/core';
 
 // Mock DOM - create minimap container first (compass attaches to it)
 const mockMinimapContainer = document.createElement('div');
@@ -13,7 +13,7 @@ document.body.appendChild(mockMinimapContainer);
 
 describe('Compass', () => {
   let compass: Compass;
-  let mockCamera: ArcRotateCamera;
+  let mockCamera: FreeCamera;
 
   beforeEach(() => {
     // Clear minimap container
@@ -21,7 +21,7 @@ describe('Compass', () => {
 
     // Create mock camera
     mockCamera = {
-      alpha: 0 // Horizontal rotation
+      rotation: { x: 0, y: 0, z: 0 } // FreeCamera uses rotation.y for yaw
     } as any;
 
     compass = new Compass('compass');
@@ -71,13 +71,13 @@ describe('Compass', () => {
       compass.setCamera(mockCamera);
       
       // Test different angles
-      mockCamera.alpha = Math.PI / 2; // 90 degrees
+      mockCamera.rotation.y = Math.PI / 2; // 90 degrees
       expect(() => compass.update()).not.toThrow();
       
-      mockCamera.alpha = Math.PI; // 180 degrees
+      mockCamera.rotation.y = Math.PI; // 180 degrees
       expect(() => compass.update()).not.toThrow();
       
-      mockCamera.alpha = -Math.PI / 2; // -90 degrees
+      mockCamera.rotation.y = -Math.PI / 2; // -90 degrees
       expect(() => compass.update()).not.toThrow();
     });
   });

@@ -148,13 +148,13 @@ export class AISystem {
     ));
 
     // Try to build a turret
-    if (this.buildingSystem.buildGroundStructure(BuildingType.TURRET, structurePos, 'ai')) {
+    if (this.buildingSystem.buildGroundStructure(BuildingType.TURRET, structurePos, 'ai').success) {
       this.logger.debug('AI built turret', { position: structurePos });
       return;
     }
 
     // Fallback to barrier
-    if (this.buildingSystem.buildGroundStructure(BuildingType.BARRIER, structurePos, 'ai')) {
+    if (this.buildingSystem.buildGroundStructure(BuildingType.BARRIER, structurePos, 'ai').success) {
       this.logger.debug('AI built barrier', { position: structurePos });
     }
   }
