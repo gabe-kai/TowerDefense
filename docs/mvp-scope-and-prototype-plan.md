@@ -363,4 +363,4 @@ After this document, the most useful implementation-facing planning docs are lik
 2. `docs/data/npc-schema-and-value-ranges.md`
 3. `docs/data/building-data-sheet.md`
 4. `docs/data/wave-data-sheet.md`
-5. `Sabine starting package data sheet`
+5. `docs/data/sabine-starting-package.md`
