@@ -20,6 +20,7 @@ Primary companion docs:
 - `docs/camera-controls-and-visibility-spec.md`
 - `docs/economy-buildings-design.md`
 - `docs/factions/sabine-merrow-faction-design.md`
+- `docs/data/npc-schema-and-value-ranges.md`
 
 ## Scope
 

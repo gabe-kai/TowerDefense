@@ -27,6 +27,7 @@ When a conflict appears:
 
 - `building-data-sheet.md`: first-playable building roster, schema, and milestone sequencing for the shared baseline
 - `wave-data-sheet.md`: first-playable monster roster, wave-template schema, warning-stage data, and milestone sequencing for the shared baseline
+- `npc-schema-and-value-ranges.md`: first-playable NPC schema, value ranges, defaults, visibility guidance, and milestone field cuts
 
 ## Authoring Rules
 
@@ -42,7 +43,6 @@ Use descriptive filenames ending in `-data-sheet.md`.
 
 Recommended future files:
 
-- `npc-schema-and-value-ranges.md`
 - `sabine-starting-package-data-sheet.md`
 
 ## Update Rule

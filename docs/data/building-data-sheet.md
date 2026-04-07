@@ -17,6 +17,7 @@ Primary companion docs:
 - `docs/prototype-backlog.md`
 - `docs/economy-buildings-design.md`
 - `docs/camera-controls-and-visibility-spec.md`
+- `docs/data/npc-schema-and-value-ranges.md`
 
 ## Scope
 

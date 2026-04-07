@@ -360,7 +360,7 @@ The project should only move into broader V1 expansion when:
 After this document, the most useful implementation-facing planning docs are likely:
 
 1. `docs/prototype-backlog.md`
-2. `NPC schema and value ranges`
-3. `building data sheet`
+2. `docs/data/npc-schema-and-value-ranges.md`
+3. `docs/data/building-data-sheet.md`
 4. `docs/data/wave-data-sheet.md`
 5. `Sabine starting package data sheet`
