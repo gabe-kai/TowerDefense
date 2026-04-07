@@ -10,6 +10,10 @@ This document defines the first-playable monster and wave model for the tower de
 
 The goal of V1 is not to simulate every fantasy monster behavior. The goal is to make waves readable, reroutable, thematically distinct, and dangerous to the specific structures and resources the player is trying to protect.
 
+Implementation-facing companion:
+
+- `docs/data/wave-data-sheet.md`
+
 ## V1 Design Goals
 
 - Make the first playable easy to read from a tower-centered perspective.
@@ -281,6 +285,12 @@ V1 recommendation:
 
 ## Threat Roles
 
+Implementation note:
+
+- the implementation-facing baseline in `docs/data/wave-data-sheet.md` treats `Vermin Surge`, `Gnawers`, and `Ramhorns` as the Prototype 3 minimum slice
+- `Hungry Predators`, `Panicked Herd`, `Blight Locusts`, and `Scrap Runners` are still in the first implementation milestone, but can land after the minimum route-pressure proof
+- `Gate-Cutters`, `Cinderkin`, and `Wellmaw` are broader first-playable extensions rather than Prototype 3 minimum requirements
+
 The first playable roster should cover these roles:
 
 - `Scouts and skirmishers`: Scrap Runners
@@ -301,6 +311,53 @@ This gives V1 six concrete monster types if both swarm variants are included:
 - Wellmaw
 
 If production needs a leaner cut, combine `Gnawers` and `Blight Locusts` into one generic `Scurry Swarm` and delay `Gate-Cutters` until a first post-playable update.
+
+## Implementation Baseline
+
+To keep the design doc and the data sheet aligned, use the following scope cut unless a later decision log overrides it.
+
+### Prototype 3 Minimum
+
+- `Vermin Surge`
+- `Gnawers`
+- `Ramhorns`
+- one warning-event template
+- one pass-by swarm template
+- one early breach template
+
+Purpose:
+
+- prove warning-stage pressure
+- prove early food pressure
+- prove simple gate and palisade interaction
+- prove event-based settlement diversion
+
+### Later In First Implementation Milestone
+
+- `Hungry Predators`
+- `Panicked Herd`
+- `Blight Locusts`
+- `Scrap Runners`
+- first mid-wave `Plunder` template
+
+Purpose:
+
+- expand warning-stage civilian and livestock pressure
+- introduce deliberate mana and logistics targeting
+- prove the migration-to-incursion transition
+
+### Broader First-Playable Only
+
+- `Gate-Cutters`
+- `Cinderkin`
+- `Wellmaw`
+- layered fire-support and boss-led templates
+
+Purpose:
+
+- add secondary-disaster pressure
+- add a simpler boss climax without committing to a larger boss roster
+- avoid blocking the milestone on fire or boss complexity
 
 ## Escalation Pattern
 
@@ -980,11 +1037,11 @@ These are the main ways the monster system can sprawl too early:
 
 1. Ground pathing with entry-to-exit waves
 2. Settlement attraction and diversion checks
-3. Warning mini-hordes plus Scurry Swarm and Ramhorn waves
+3. Warning mini-hordes plus `Vermin Surge`, `Gnawers`, and `Ramhorns`
 4. Basic warning-stage presentation
-5. Raider family with gate and mana targeting
+5. `Scrap Runners` and the first deliberate `Plunder` wave template
 6. Fire support units
-7. Wellmaw boss and temporary mana disruption
+7. `Wellmaw` boss and temporary mana disruption
 
 ## Open Questions for Next Pass
 

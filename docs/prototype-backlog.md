@@ -147,8 +147,9 @@ Prove that waves feel like moving landscape pressure instead of fixed-lane tower
 
 - off-map entry and exit
 - one simple terrain map with hills, open ground, and a chokepoint
-- one early swarm-type threat
-- one mid-tier raider or brute threat
+- `Vermin Surge` warning-stage event
+- `Gnawers` as the early swarm-type threat
+- `Ramhorns` as the mid-tier brute threat
 - warning-stage escalation
 - simple settlement diversion logic
 - simple structure targeting logic
@@ -294,6 +295,7 @@ After the baseline prototype sequence, likely next backlog items are:
 - boss encounter readability pass
 - site naming and report-legibility polish
 - implementation-facing data sheets
+- follow-through on `docs/data/wave-data-sheet.md` milestone rows: `Scrap Runners`, then `Cinderkin`, then `Wellmaw`
 
 ## Relationship To Other Docs
 
