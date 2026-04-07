@@ -351,7 +351,7 @@ The project should only move into broader V1 expansion when:
 
 After this document, the most useful implementation-facing planning docs are likely:
 
-1. `prototype backlog and implementation order`
+1. `docs/prototype-backlog.md`
 2. `NPC schema and value ranges`
 3. `building data sheet`
 4. `monster and wave data sheet`
