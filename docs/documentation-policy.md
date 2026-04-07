@@ -30,7 +30,7 @@ The main body of a design doc should not become a diary of every old idea unless
 
 ## Document Types
 
-The project should use four document types.
+The project should use five document types.
 
 ### 1. Core Design Docs
 
@@ -93,6 +93,23 @@ Rules:
 - move durable conclusions into a core design doc or planning doc
 - retire or delete them once superseded
 
+### 5. Implementation-Facing Data Sheets
+
+These translate approved design direction into structured, prototype-usable reference sheets for implementation, balancing, content setup, and AI-assisted build work.
+
+Examples:
+
+- `docs/data/building-data-sheet.md`
+- future monster, NPC, and faction-package sheets under `docs/data/`
+
+Rules:
+
+- treat these as derived implementation references, not the primary design source of truth
+- keep ids, field names, and enum vocabulary stable once downstream implementation starts depending on them
+- favor consistent schema, compact wording, and explicit placeholders over broad explanatory prose
+- update these when implementation-facing structure changes, even if the higher-level design intent does not
+- when these diverge from a core design doc, reconcile the mismatch deliberately rather than letting both drift
+
 ## Status Header Standard
 
 Major docs should keep a short header near the top using this format:
@@ -116,8 +133,9 @@ Optional fields:
 When a design changes:
 
 1. Update the relevant current-truth doc.
-2. Add a brief entry to `docs/decision-log.md` if the change is meaningful.
-3. Update planning docs only if the change affects delivery order or scope.
+2. Update any affected implementation-facing data sheet if build-facing structure or values changed.
+3. Add a brief entry to `docs/decision-log.md` if the change is meaningful.
+4. Update planning docs only if the change affects delivery order or scope.
 
 Do not keep both the old and new rule in the main design section unless the distinction is an intentional phased rollout.
 
@@ -167,6 +185,7 @@ Recommended lightweight review rhythm:
 - after every major design thread, update the relevant core doc
 - after every major milestone, review the GDD for cleanup
 - before implementation of a system, review its core doc for current-truth accuracy
+- before implementation of a data-driven system, review both its core doc and any matching data sheet under `docs/data/`
 - after prototype results, record major changes in the decision log
 
 ## GDD Policy

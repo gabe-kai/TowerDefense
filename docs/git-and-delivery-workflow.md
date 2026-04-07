@@ -295,7 +295,8 @@ For this project right now, the simplest good workflow is:
 The next normal-cycle branches will likely look like:
 
 - `docs/prototype-backlog`
-- `docs/data-specs-baseline`
+- `docs/building-data-sheet`
+- `docs/monster-wave-data-sheet`
 - `feat/tower-camera-prototype`
 - `feat/survey-map-prototype`
 - `feat/wave-routing-prototype`
