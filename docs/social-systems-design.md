@@ -789,10 +789,14 @@ That should feel rich without collapsing under data complexity.
 
 The next implementation-facing documents should likely be:
 
-1. `NPC schema and value ranges`
+1. `docs/data/npc-schema-and-value-ranges.md`
 2. `Morale, loyalty, and grief formulas`
 3. `Drafting, immigration, and desertion rules`
 4. `Example households and sample villagers`
+
+Status note:
+
+- `docs/data/npc-schema-and-value-ranges.md` now exists as the current implementation-facing companion for milestone-1 NPC fields, defaults, and value ranges
 
 ## Queued Faction Overlay Work
 

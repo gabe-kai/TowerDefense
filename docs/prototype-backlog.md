@@ -295,6 +295,7 @@ After the baseline prototype sequence, likely next backlog items are:
 - boss encounter readability pass
 - site naming and report-legibility polish
 - implementation-facing data sheets
+- integration follow-through on `docs/data/npc-schema-and-value-ranges.md` for Prototype 4 field cuts and first-playable defaults
 - follow-through on `docs/data/wave-data-sheet.md` milestone rows: `Scrap Runners`, then `Cinderkin`, then `Wellmaw`
 
 ## Relationship To Other Docs
@@ -303,6 +304,7 @@ This backlog should be read alongside:
 
 - `docs/mvp-scope-and-prototype-plan.md`
 - `docs/game-design-document.md`
+- `docs/data/npc-schema-and-value-ranges.md`
 - subsystem specs under `docs/`
 
 If the MVP plan changes, this backlog should be updated to match it.
