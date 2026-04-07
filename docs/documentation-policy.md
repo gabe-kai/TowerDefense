@@ -22,6 +22,10 @@ Historical thinking should be preserved through:
 - `docs/decision-log.md`
 - milestone planning documents
 
+Repository workflow expectations are defined separately in:
+
+- `docs/git-and-delivery-workflow.md`
+
 The main body of a design doc should not become a diary of every old idea unless that older phase still matters to current implementation.
 
 ## Document Types
@@ -71,6 +75,7 @@ Examples:
 
 - `docs/mvp-scope-and-prototype-plan.md`
 - later milestone plans
+- workflow and delivery process documents such as `docs/git-and-delivery-workflow.md`
 
 Rules:
 
