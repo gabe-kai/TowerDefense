@@ -31,6 +31,9 @@ There is no gameplay code yet. The main purpose of this repository right now is 
 - `docs/monster-wave-design.md`
 - `docs/camera-controls-and-visibility-spec.md`
 - `docs/factions/`
+- `docs/documentation-policy.md`
+- `docs/decision-log.md`
+- `docs/git-and-delivery-workflow.md`
 
 ## Documentation Approach
 
@@ -39,6 +42,7 @@ The repository uses a current-truth documentation model:
 - major design docs describe the design as it is understood now
 - major design changes should be recorded in `docs/decision-log.md`
 - documentation standards are defined in `docs/documentation-policy.md`
+- git workflow expectations are defined in `docs/git-and-delivery-workflow.md`
 
 ## License
 
