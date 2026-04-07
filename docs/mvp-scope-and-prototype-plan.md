@@ -116,6 +116,13 @@ This milestone is not the whole intended V1 faction set.
 - settlement diversion rules
 - fire as a settlement hazard
 
+Implementation-facing baseline:
+
+- Prototype 3 minimum roster: `Vermin Surge`, `Gnawers`, `Ramhorns`
+- later in milestone: `Hungry Predators`, `Panicked Herd`, `Blight Locusts`, `Scrap Runners`
+- broader first-playable only: `Gate-Cutters`, `Cinderkin`, `Wellmaw`
+- companion data source: `docs/data/wave-data-sheet.md`
+
 ## Explicitly Out Of Scope
 
 These should not be required for the first implementation milestone.
@@ -231,8 +238,9 @@ Minimum prototype ingredients:
 
 - simple map terrain
 - off-map entry and exit
-- one swarm type
-- one raider or brute type
+- `Vermin Surge` warning event
+- `Gnawers` as the baseline swarm type
+- `Ramhorns` as the baseline breach type
 - simple diversion rule
 - simple palisade/gate interaction
 
@@ -354,5 +362,5 @@ After this document, the most useful implementation-facing planning docs are lik
 1. `docs/prototype-backlog.md`
 2. `NPC schema and value ranges`
 3. `building data sheet`
-4. `monster and wave data sheet`
+4. `docs/data/wave-data-sheet.md`
 5. `Sabine starting package data sheet`

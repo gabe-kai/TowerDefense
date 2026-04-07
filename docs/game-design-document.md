@@ -902,6 +902,7 @@ This is a suggested first playable target for the first implementation milestone
 - Optional early support structures: `Watchtower`, `Guard Post`, `Mana Reservoir`
 - Limited terrain interaction: tree clearing, road placement, simple trench or barricade construction
 - Limited first-playable monster roster from `docs/monster-wave-design.md`, including early swarms, mid-tier raiders and brutes, and one initial boss family
+- Implementation-facing companion for that roster: `docs/data/wave-data-sheet.md`
 - Wave routing from off-map entry to off-map exit with settlement aggro, warning escalation, and limited rerouting rules
 - Relationship system backed by named NPCs, but with an intentionally limited v1 behavioral model
 
@@ -932,6 +933,8 @@ The next most useful documentation work is:
 
 1. `MVP scope and prototype plan`
 2. Prototype-facing data specs for buildings, monsters, NPC values, and faction starting packages
+   - `docs/data/building-data-sheet.md`
+   - `docs/data/wave-data-sheet.md`
 3. A cleanup pass across support docs once the MVP cut is locked
 
 ## Document Roadmap

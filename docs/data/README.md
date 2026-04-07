@@ -26,6 +26,7 @@ When a conflict appears:
 ## Current Files
 
 - `building-data-sheet.md`: first-playable building roster, schema, and milestone sequencing for the shared baseline
+- `wave-data-sheet.md`: first-playable monster roster, wave-template schema, warning-stage data, and milestone sequencing for the shared baseline
 
 ## Authoring Rules
 
@@ -41,7 +42,6 @@ Use descriptive filenames ending in `-data-sheet.md`.
 
 Recommended future files:
 
-- `monster-wave-data-sheet.md`
 - `npc-schema-and-value-ranges.md`
 - `sabine-starting-package-data-sheet.md`
 

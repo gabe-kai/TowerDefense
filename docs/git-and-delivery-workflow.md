@@ -296,7 +296,7 @@ The next normal-cycle branches will likely look like:
 
 - `docs/prototype-backlog`
 - `docs/building-data-sheet`
-- `docs/monster-wave-data-sheet`
+- `docs/wave-data-sheet`
 - `feat/tower-camera-prototype`
 - `feat/survey-map-prototype`
 - `feat/wave-routing-prototype`
