@@ -34,6 +34,8 @@ There is no gameplay code yet. The main purpose of this repository right now is 
 - `docs/documentation-policy.md`
 - `docs/decision-log.md`
 - `docs/git-and-delivery-workflow.md`
+- `docs/mvp-scope-and-prototype-plan.md`
+- `docs/prototype-backlog.md`
 
 ## Documentation Approach
 
