@@ -10,6 +10,10 @@ This document defines Lady Sabine Merrow, the first playable master for the towe
 
 It is intentionally V1-focused. The goal is to establish a clear baseline faction that teaches the intended game loop, aligns with the existing economy and social systems, and provides a stable reference point for later harsher or stranger masters.
 
+Implementation-facing companion:
+
+- `docs/data/sabine-starting-package.md`
+
 ## Role of the First Playable Master
 
 The first playable master should be the game's easy-mode baseline.
@@ -460,6 +464,10 @@ Practical hooks:
 ## Starting Settlement Package
 
 Sabine's opener should be slightly more orderly and protected than a neutral baseline, without skipping the core build-out game.
+
+Implementation note:
+
+- The milestone-1 placeholder package, starting roster assumptions, opening stockpiles, and recommended first warning profile now live in `docs/data/sabine-starting-package.md`.
 
 ### Starting Buildings
 

@@ -28,6 +28,7 @@ When a conflict appears:
 - `building-data-sheet.md`: first-playable building roster, schema, and milestone sequencing for the shared baseline
 - `wave-data-sheet.md`: first-playable monster roster, wave-template schema, warning-stage data, and milestone sequencing for the shared baseline
 - `npc-schema-and-value-ranges.md`: first-playable NPC schema, value ranges, defaults, visibility guidance, and milestone field cuts
+- `sabine-starting-package.md`: first-playable Sabine opener, starting settlement package, tutorial goals, and milestone-1 placeholder setup guidance
 
 ## Authoring Rules
 
@@ -39,11 +40,12 @@ When a conflict appears:
 
 ## Naming Convention
 
-Use descriptive filenames ending in `-data-sheet.md`.
+Use descriptive filenames that clearly match their implementation role.
 
-Recommended future files:
+Current patterns include:
 
-- `sabine-starting-package-data-sheet.md`
+- `*-data-sheet.md` for broad schema or roster sheets
+- `*-package.md` for authored starting-package references
 
 ## Update Rule
 
