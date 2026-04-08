@@ -254,6 +254,10 @@ Minimum prototype ingredients:
 
 ### Prototype 4: Human Consequence Layer
 
+Implementation-facing companion:
+
+- `docs/implementation/prototype-4-social-consequence-and-named-villagers-checklist.md`
+
 Must answer:
 
 - Do named NPCs change how damage feels?
