@@ -136,6 +136,10 @@ Prove that building, logistics, damage, and rebuilding form a satisfying between
 
 ## Prototype 3: Wave Routing and Defensive Pressure
 
+Implementation-facing companion:
+
+- `docs/implementation/prototype-3-wave-routing-and-defensive-pressure-checklist.md`
+
 ### Goal
 
 Prove that waves feel like moving landscape pressure instead of fixed-lane tower defense.
