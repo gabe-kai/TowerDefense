@@ -82,6 +82,10 @@ Prove that the player experience works from a tower-anchored perspective without
 
 ## Prototype 2: Settlement Economy and Rebuild Loop
 
+Implementation-facing companion:
+
+- `docs/implementation/prototype-2-settlement-economy-and-rebuild-loop-checklist.md`
+
 ### Goal
 
 Prove that building, logistics, damage, and rebuilding form a satisfying between-wave loop.

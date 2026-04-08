@@ -209,6 +209,10 @@ Minimum prototype ingredients:
 
 ### Prototype 2: Settlement Recovery Loop
 
+Implementation-facing companion:
+
+- `docs/implementation/prototype-2-settlement-economy-and-rebuild-loop-checklist.md`
+
 Must answer:
 
 - Does rebuilding between waves feel meaningful?
