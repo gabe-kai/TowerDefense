@@ -179,6 +179,10 @@ Prove that waves feel like moving landscape pressure instead of fixed-lane tower
 
 ## Prototype 4: Social Consequence and Named Villagers
 
+Implementation-facing companion:
+
+- `docs/implementation/prototype-4-social-consequence-and-named-villagers-checklist.md`
+
 ### Goal
 
 Prove that named villagers, households, and social consequences make losses feel different from ordinary RTS losses.
