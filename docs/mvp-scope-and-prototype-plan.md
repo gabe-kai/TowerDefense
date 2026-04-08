@@ -232,6 +232,10 @@ Minimum prototype ingredients:
 
 ### Prototype 3: Wave Routing Pressure
 
+Implementation-facing companion:
+
+- `docs/implementation/prototype-3-wave-routing-and-defensive-pressure-checklist.md`
+
 Must answer:
 
 - Do waves feel like moving landscape pressure rather than lanes?
