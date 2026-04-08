@@ -308,6 +308,10 @@ Minimum prototype ingredients:
 
 ### Phase 5: Sabine Layer
 
+Implementation-facing companion:
+
+- `docs/implementation/prototype-5-sabine-baseline-faction-layer-checklist.md`
+
 21. Bell Post
 22. Sabine command cadence
 23. Sabine spell/rune/policy kit

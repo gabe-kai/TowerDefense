@@ -224,6 +224,10 @@ Prove that named villagers, households, and social consequences make losses feel
 
 ## Prototype 5: Sabine Baseline Faction Layer
 
+Implementation-facing companion:
+
+- `docs/implementation/prototype-5-sabine-baseline-faction-layer-checklist.md`
+
 ### Goal
 
 Prove the baseline teaching faction on top of the shared systems.
