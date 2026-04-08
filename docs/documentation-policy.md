@@ -83,6 +83,8 @@ Rules:
 - they are still valuable historical planning artifacts
 - they should clearly state their planning phase and intended use
 
+Directory index files such as `docs/README.md`, `docs/data/README.md`, `docs/factions/README.md`, and `docs/implementation/README.md` should be maintained as navigation aids whenever a folder gains enough documents that a new reader could miss an important path.
+
 ### 4. Working Drafts
 
 These are temporary exploration docs used to think through a question before it is absorbed into a core doc.
@@ -109,6 +111,23 @@ Rules:
 - favor consistent schema, compact wording, and explicit placeholders over broad explanatory prose
 - update these when implementation-facing structure changes, even if the higher-level design intent does not
 - when these diverge from a core design doc, reconcile the mismatch deliberately rather than letting both drift
+
+## Navigation Policy
+
+As the doc set grows, every major directory should make it obvious how to move between:
+
+- top-level design intent
+- milestone scope and planning
+- implementation-planning checklists
+- implementation-facing data sheets
+- faction overlays
+
+Practical navigation rules:
+
+- top-level entry docs should point to the most important adjacent source-of-truth or planning docs
+- implementation directories with several files should have a `README.md` index
+- data and faction directories should keep their README indexes current
+- when a new project-level doc materially changes where implementation readers should start, update the nearest index or entry-point doc in the same change
 
 ## Status Header Standard
 

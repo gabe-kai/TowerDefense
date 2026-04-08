@@ -19,6 +19,13 @@ It is meant to answer:
 
 This is not a detailed engineering task tracker. It is a high-level product and design backlog for prototype sequencing.
 
+Read this alongside:
+
+- `docs/mvp-scope-and-prototype-plan.md`
+- `docs/implementation/prototype-integration-order.md`
+- `docs/implementation/engine-and-architecture-decision.md`
+- `docs/implementation/README.md`
+
 ## Backlog Principles
 
 - Prototype identity before content volume.

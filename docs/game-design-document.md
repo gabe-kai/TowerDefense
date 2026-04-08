@@ -16,6 +16,8 @@ Detailed subsystem specs should live in focused side documents under `docs/`, wh
 
 Documentation standards for this project are defined in `docs/documentation-policy.md`.
 Major design changes and scope locks should be recorded in `docs/decision-log.md`.
+Implementation direction and milestone architecture boundaries are defined in `docs/implementation/engine-and-architecture-decision.md`.
+Implementation-planning entry points are collected in `docs/implementation/README.md`.
 
 ## High Concept
 

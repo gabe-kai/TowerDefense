@@ -16,6 +16,12 @@ This document defines:
 - which systems must be prototyped first
 - the recommended implementation order
 
+Read this alongside:
+
+- `docs/implementation/engine-and-architecture-decision.md`
+- `docs/implementation/prototype-integration-order.md`
+- `docs/implementation/README.md`
+
 This is a planning document, not the full game design canon. It should stay tightly focused on how to turn the current design set into a realistic first playable build.
 
 ## Planning Principles
