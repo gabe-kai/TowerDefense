@@ -49,6 +49,28 @@ Affected Docs:
 - `docs/documentation-policy.md`
 - `docs/game-design-document.md`
 
+## 2026-04-07 - Implementation Navigation Spine Added
+
+Status:
+- Accepted
+
+Decision:
+- The documentation set now explicitly includes directory-level navigation for implementation work, and the project-level planning docs now point more clearly toward the engine/architecture decision, integration order, and implementation indexes.
+
+Why:
+- The document set has reached the point where important implementation-facing files could become hard to discover without a clearer navigation spine between design, planning, implementation, data, and faction docs.
+
+Affected Docs:
+- `docs/README.md`
+- `docs/documentation-policy.md`
+- `docs/game-design-document.md`
+- `docs/mvp-scope-and-prototype-plan.md`
+- `docs/prototype-backlog.md`
+- `docs/data/README.md`
+- `docs/factions/README.md`
+- `docs/implementation/README.md`
+- `docs/implementation/prototype-integration-order.md`
+
 ## 2026-04-06 - Camera And Visibility Moved To Dedicated Spec
 
 Status:

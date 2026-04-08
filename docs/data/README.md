@@ -17,6 +17,12 @@ These files are intended to help with:
 
 They are not the primary design source of truth.
 
+For implementation planning, read these alongside:
+
+- `docs/implementation/README.md`
+- `docs/implementation/engine-and-architecture-decision.md`
+- `docs/implementation/prototype-integration-order.md`
+
 When a conflict appears:
 
 1. check the matching core design doc
@@ -29,6 +35,13 @@ When a conflict appears:
 - `wave-data-sheet.md`: first-playable monster roster, wave-template schema, warning-stage data, and milestone sequencing for the shared baseline
 - `npc-schema-and-value-ranges.md`: first-playable NPC schema, value ranges, defaults, visibility guidance, and milestone field cuts
 - `sabine-starting-package.md`: first-playable Sabine opener, starting settlement package, tutorial goals, and milestone-1 placeholder setup guidance
+
+## How To Navigate From Here
+
+- if you need current design intent, go back to the matching core design doc
+- if you need build order, go to `docs/prototype-backlog.md` and `docs/implementation/prototype-integration-order.md`
+- if you need project-level technical direction, go to `docs/implementation/engine-and-architecture-decision.md`
+- if you need faction-specific setup context, go to `docs/factions/sabine-merrow-faction-design.md`
 
 ## Authoring Rules
 

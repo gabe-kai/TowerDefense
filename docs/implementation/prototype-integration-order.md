@@ -10,6 +10,7 @@ This document turns the current prototype stack into a practical integration seq
 
 It is not a replacement for:
 
+- `docs/implementation/engine-and-architecture-decision.md`
 - `docs/mvp-scope-and-prototype-plan.md`
 - `docs/prototype-backlog.md`
 - `docs/implementation/prototype-1-camera-and-information-readability-checklist.md`
@@ -23,6 +24,12 @@ It is not a replacement for:
 - `docs/data/sabine-starting-package.md`
 
 Its job is to describe how the five prototypes should actually be layered, stubbed, replaced, and integrated into one working first implementation milestone.
+
+Read this after:
+
+- `docs/implementation/engine-and-architecture-decision.md`
+- `docs/mvp-scope-and-prototype-plan.md`
+- `docs/prototype-backlog.md`
 
 ## Purpose
 
