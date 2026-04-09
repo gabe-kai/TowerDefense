@@ -32,13 +32,15 @@ For a fresh implementation pass, use this order:
 2. `../mvp-scope-and-prototype-plan.md`
 3. `../prototype-backlog.md`
 4. `prototype-integration-order.md`
-5. the relevant prototype checklist
-6. the matching data sheet under `../data/`
+5. `vertical-slice-acceptance-criteria.md`
+6. the relevant prototype checklist
+7. the matching data sheet under `../data/`
 
 ## Current Files
 
 - `engine-and-architecture-decision.md`: project-level implementation direction for engine choice, architecture boundaries, terrain strategy, and deferred complexity
 - `prototype-integration-order.md`: how the five prototype tracks should be layered into one shared runtime
+- `vertical-slice-acceptance-criteria.md`: project-level acceptance criteria for what the first playable vertical slice must prove, what may remain placeholder, and what still blocks broader expansion
 - `prototype-1-camera-and-information-readability-checklist.md`: implementation checklist for the camera, survey-map, alert, and command-readability slice
 - `prototype-2-settlement-economy-and-rebuild-loop-checklist.md`: implementation checklist for economy, logistics, damage, and rebuilding
 - `prototype-3-wave-routing-and-defensive-pressure-checklist.md`: implementation checklist for wave traversal, diversion, gates, and pressure

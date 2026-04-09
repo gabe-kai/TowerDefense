@@ -20,6 +20,7 @@ Read this alongside:
 
 - `docs/implementation/engine-and-architecture-decision.md`
 - `docs/implementation/prototype-integration-order.md`
+- `docs/implementation/vertical-slice-acceptance-criteria.md`
 - `docs/implementation/README.md`
 
 This is a planning document, not the full game design canon. It should stay tightly focused on how to turn the current design set into a realistic first playable build.
@@ -367,6 +368,10 @@ These should be resolved before or during prototype planning, because they affec
 5. How much of Sabine's special battlefield intervention belongs in the first milestone versus later tuning?
 
 ## Exit Criteria For Moving Beyond The First Milestone
+
+Project-level acceptance for this step is defined more explicitly in:
+
+- `docs/implementation/vertical-slice-acceptance-criteria.md`
 
 The project should only move into broader V1 expansion when:
 
