@@ -25,6 +25,9 @@ Historical thinking should be preserved through:
 Repository workflow expectations are defined separately in:
 
 - `docs/git-and-delivery-workflow.md`
+- `docs/development-process.md`
+- `docs/testing-and-debugging-strategy.md`
+- `docs/definition-of-done.md`
 
 The main body of a design doc should not become a diary of every old idea unless that older phase still matters to current implementation.
 
@@ -76,6 +79,7 @@ Examples:
 - `docs/mvp-scope-and-prototype-plan.md`
 - later milestone plans
 - workflow and delivery process documents such as `docs/git-and-delivery-workflow.md`
+- development quality/process documents such as `docs/development-process.md`, `docs/testing-and-debugging-strategy.md`, and `docs/definition-of-done.md`
 
 Rules:
 
