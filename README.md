@@ -86,6 +86,9 @@ Project planning and process:
 - `docs/documentation-policy.md`
 - `docs/decision-log.md`
 - `docs/git-and-delivery-workflow.md`
+- `docs/development-process.md`
+- `docs/testing-and-debugging-strategy.md`
+- `docs/definition-of-done.md`
 
 Implementation planning:
 
@@ -111,6 +114,9 @@ This repository uses a current-truth documentation model:
 - major locked changes should be recorded in `docs/decision-log.md`
 - documentation standards are defined in `docs/documentation-policy.md`
 - git workflow expectations are defined in `docs/git-and-delivery-workflow.md`
+- day-to-day development expectations are defined in `docs/development-process.md`
+- testing and debug expectations are defined in `docs/testing-and-debugging-strategy.md`
+- merge-complete standards are defined in `docs/definition-of-done.md`
 
 ## Immediate Next Step
 
