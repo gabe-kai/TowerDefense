@@ -28,6 +28,7 @@ Its job is to describe how the five prototypes should actually be layered, stubb
 Read this after:
 
 - `docs/implementation/engine-and-architecture-decision.md`
+- `docs/implementation/unity-project-scaffolding-plan.md`
 - `docs/mvp-scope-and-prototype-plan.md`
 - `docs/prototype-backlog.md`
 
@@ -70,6 +71,7 @@ It should become one shared runtime with progressively fewer authored cheats.
 
 ### Phase 0: Shared Scene and State Scaffolding
 
+- [ ] apply the Unity project cleanup and folder scaffolding baseline from `docs/implementation/unity-project-scaffolding-plan.md`
 - [ ] create one shared prototype map scene
 - [ ] create one shared settlement state container
 - [ ] create one shared site registry
