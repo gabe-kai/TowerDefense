@@ -11,6 +11,7 @@ This document turns the current camera, visibility, alert, and command design in
 It is not a replacement for:
 
 - `docs/camera-controls-and-visibility-spec.md`
+- `docs/implementation/unity-project-scaffolding-plan.md`
 - `docs/mvp-scope-and-prototype-plan.md`
 - `docs/prototype-backlog.md`
 
@@ -19,6 +20,8 @@ Its job is to define the smallest implementation slice that can prove the live t
 ## Prototype Goal
 
 Prototype 1 should prove that the player can operate from a tower-anchored point of view, switch to a surveyed planning map when needed, and make reasonable decisions under incomplete information without feeling blind or cheated.
+
+This checklist assumes the initial Unity project cleanup and folder scaffolding pass has already happened, so camera, map, alert, debug, and scene work can land in project-owned locations instead of template folders.
 
 This prototype should stay intentionally small:
 
